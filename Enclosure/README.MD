@@ -1,1 +1,1 @@
-
+This directory contains instructions and schematics for modifying the Hammond 1551WHBK black polycarbonate, IP68 rated (waterproof) enclosure to install the buttons and USB-C connector (or power wires).

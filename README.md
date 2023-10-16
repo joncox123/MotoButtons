@@ -30,7 +30,7 @@ To build your own Motobuttons Lite, I suggest the following tools and supplies, 
   - Black color is recommended, such as [Permatex 81158](https://www.amazon.com/Permatex-81158-Silicone-Adhesive-Sealant/dp/B000AL6WLA). Can also be found at most auto parts stores for a higher price. If you already have clear silicone, there's no need to buy additional sealant.
 
 ## Parts to Order
-In addition to the tools and supplies mentioned above, you will need to order the parts required to construct Motobuttons Lite. [This link](https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=e90304f243) will allow you to order the necessary parts from Mouser.com.
+In addition to the tools and supplies mentioned above, you will need to order the parts required to construct Motobuttons Lite. [This link](https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=e90304f243) will allow you to order the necessary parts from Mouser.com. Also, you can view the [formal Bill of Materials](https://github.com/joncox123/MotoButtons/tree/main/Parts) and data sheets, if interested.
 -	$10.38 [Seeed Studio XIAO nRF52840 - Bluetooth 5.0](https://www.mouser.com/ProductDetail/713-102010448)
 -	$5.52 [Hammond Polycarbonate Black IP68 Enclosure 1551WHBK](https://www.mouser.com/ProductDetail/546-1551WHBK)
 -	$4.38 [Blue IP68 button with white LED](https://www.mouser.com/ProductDetail/655-2-2329387-1)

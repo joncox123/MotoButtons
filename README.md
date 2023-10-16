@@ -32,7 +32,7 @@ To build your own Motobuttons Lite, I suggest the following tools and supplies, 
 ## Parts to Order
 In addition to the tools and supplies mentioned above, you will need to order the parts required to construct Motobuttons Lite. [This link](https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=e90304f243) will allow you to order the necessary parts from Mouser.com.
 -	$10.38 [Seeed Studio XIAO nRF52840 - Bluetooth 5.0](https://www.mouser.com/ProductDetail/713-102010448)
--	$5.52 [Hammon Polycarbonate Black IP68 Enclosure 1551WHBK](https://www.mouser.com/ProductDetail/546-1551WHBK)
+-	$5.52 [Hammond Polycarbonate Black IP68 Enclosure 1551WHBK](https://www.mouser.com/ProductDetail/546-1551WHBK)
 -	$4.38 [Blue IP68 button with white LED](https://www.mouser.com/ProductDetail/655-2-2329387-1)
 -	$5.09 [Green IP68 button with white LED](https://www.mouser.com/ProductDetail/655-1-2329387-6)
 -	$1.95 [5-way Navigation Joystick Switch](https://www.mouser.com/ProductDetail/485-504)

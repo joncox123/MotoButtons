@@ -10,7 +10,7 @@ On the other hand, an ideal controller would offer a low price, small size, ligh
 As a DIY controller, the MotoButtons Lite has been designed with the highest quality, IP68 (waterproof) parts, while maintaining a low cost. In fact, the necessary parts can be ordered from Mouser.com for only $27.82 plus $7.99 UPS shipping. The only exception is that a low cost, IP68 rated 5-way navigation switch can not be purchased at this time. Thus, you will waterproof a $2.50 switch, which is surprisingly rugged and user friendly. In addition, you will need some epoxy glue, basic hole drilling tools and some other basic supplies, which most DIY enthusiasts will have in their garage.
 
 ## Microcontroller and Programming Experience Not Needed
-No programming knowledge or skill is needed to program the Bluetooth (BLE) Arduino microcontroller. Source code, as well as a simple installer are available on this site.
+No programming knowledge or skill is needed to program the Bluetooth (BLE) Arduino microcontroller. Source code, as well as a simple installer are available on this site. However, if you would like to modify the code to change or add functionality, or just want to learn Arduino programming, you can [download the programming environment](https://www.arduino.cc/en/software) (IDE) and [follow the guide](https://wiki.seeedstudio.com/XIAO_BLE/) for configuring the environment for the [Seeed XIAO nRF52840](https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html) board.
 
 ## Recommended Tools and Supplies
 To build your own Motobuttons Lite, I suggest the following tools and supplies, which can be obtained at Amazon and [Harbor Freight](https://www.harborfreight.com/), for example. However, as a DIY enthusiast, you will hopefully already have many suitable tools.
@@ -24,3 +24,19 @@ To build your own Motobuttons Lite, I suggest the following tools and supplies, 
   - For precise alignment of drilled holes to the schematic drawing template
 - [Needle file set](https://www.harborfreight.com/needle-file-set-12-piece-56743.html) (Optional)
   - Needed only if you want to have external USB-C connectivity and you are potting with epoxy
+- Small piece of sandpaper, such as 150 grit or similar
+  - For roughening the case surface prior to gluing the navigation joystick. Can be obtained at any auto parts or home improvement store.
+- Silicone sealant for waterproofing joystick
+  - Black color is recommended, such as [Permatex 81158](https://www.amazon.com/Permatex-81158-Silicone-Adhesive-Sealant/dp/B000AL6WLA). Can also be found at most auto parts stores for a higher price. If you already have clear silicone, there's no need to buy additional sealant.
+
+## Parts to Order
+In addition to the tools and supplies mentioned above, you will need to order the parts required to construct Motobuttons Lite. [This link](https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=e90304f243) will allow you to order the necessary parts from Mouser.com.
+-	$10.38 [Seeed Studio XIAO nRF52840 - Bluetooth 5.0](https://www.mouser.com/ProductDetail/713-102010448)
+-	$5.52 [Hammon Polycarbonate Black IP68 Enclosure 1551WHBK](https://www.mouser.com/ProductDetail/546-1551WHBK)
+-	$4.38 [Blue IP68 button with white LED](https://www.mouser.com/ProductDetail/655-2-2329387-1)
+-	$5.09 [Green IP68 button with white LED](https://www.mouser.com/ProductDetail/655-1-2329387-6)
+-	$1.95 [5-way Navigation Joystick Switch](https://www.mouser.com/ProductDetail/485-504)
+-	$0.50 [Rubber boot for joystick](https://www.mouser.com/ProductDetail/485-4697)
+
+## Instructions
+Complete [step-by-step instructions](https://github.com/joncox123/MotoButtons/tree/main/ConstructionGuide) for building your own MotoButtons Lite are available. If you have questions, concerns or suggestions, [please create a new issue](https://github.com/joncox123/MotoButtons/issues) in this GitHub repository.

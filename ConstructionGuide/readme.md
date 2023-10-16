@@ -6,9 +6,14 @@ First, you'll need to acquire the necessary components, tools and supplies, as m
 
 ## Let's Get Started
 ### Machine the Enclosure
-First, you need to make the necessary modifications to the Hammond IP68 rated enclosure. While I used a milling machine to do this, it's readily possible with the proper hand tools, technique and attention to detail. Take a look at the [3D model (3D PDF)](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom%203D.pdf) to get an idea of what you will be doing.
+First, you need to make the necessary modifications to the Hammond IP68 rated enclosure. While I used a milling machine to do this, it's readily possible with the proper hand tools, technique and attention to detail. At the end of the day, since you will most likely be filling the case with epoxy (potting), is not necessary for everything to be perfect. The sealant, joystick boot and buttons will cover up any minor issues.
+Take a look at the [3D model (3D PDF)](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom%203D.pdf) to get an idea of what you will be doing.
 
 <img src="../Enclosure/enclosure.png" alt="3D model of modified case" width="400"/>
+
+If you happen to have a milling machine, you can clamp the enclosure (with lid screwed on) in a vise with three layers of duct tape above the parallels.
+
+<img src="Photos/Milling_Machine_Setup.jpg" alt="case in milling machine" width="400"/>
 
 First, print out the [schematic drawing](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom.pdf) of the enclosure, making sure to print as "actual size", so that the print is scaled exactly as indicated. You may want to check the dimensions with a caliper or ruler to verify that you printed it out true to scale. 
 
@@ -47,6 +52,45 @@ The slot for a female USB-C connector is approximately 1/8" (3.18 mm) tall and 9
 <img src="Photos/Test_Fit_Microcontroller.jpg" alt="Microcontroller in USB-C slot" width="400"/>
 
 ## Glue 5-Way Navigation Switch to Case
-Congratulations, you've successfully machined your enclosure! The next step is to glue the joystick to the outside of the case using epoxy glue, and then seal the rubber boot over it with silicone sealant. 
+Congratulations, you've successfully machined your enclosure! The next step is to glue the joystick to the outside of the case using epoxy glue, and then seal the rubber boot over it with silicone sealant. Begin by assembling your gluing and sealing supplies:
+
+<img src="Photos/Assemble_Gluing_Supplies.jpg" alt="gluing supplies" width="400"/>
+
+First, lightly sand the area on the case where the switch will sit with some 150 grit or similar sand paper. This will help the epoxy stick to the case. Then *very throroughly clean* the case with an alcohol wipe or rubbing alcohol. Blow off any lint that remains. You may also want to wipe down the bottom and sides of the switch with alcohol, especially if you have been handling it. Preparation is key to achieving a durable and waterproof bond. 
+
+<img src="Photos/Scuff_Switch_Gluing_Area.jpg" alt="sanding case" width="400"/>
+
+Mix up a small amount of C-POXY 30 two-part epoxy. This epoxy has an approximately 10 minute working time and takes about two hours to cure (full cure in 24 hours). Using a small stick or applicator, carefully spread a thin layer between the holes on the case, being **careful not to apply epoxy over the holes.** Also apply a **thin layer** of epoxy to the underside of the switch. *Note: the amount applied in the photos is more than you need, just use a thin layer*. 
+
+<img src="Photos/Apply_Epoxy_To_Case.jpg" alt="epoxy on case" width="400"/>
+
+<img src="Photos/Apply_Glue_to_Switch_Bottom.jpg" alt="epoxy on switch" width="400"/>
+
+Insert the switch to the holes of the case, making sure not to get any epoxy on the electrical pins. **Observe the proper orientation of the switch, as it is not symmetric top to bottom. The two holes in the "middle" are closer to the bottom side (away from buttons), so line them up before inserting**. A little epoxy should squish out the sides, and you can wipe additional epoxy along the sides of the switch, being careful not to get any on the upper portion (and ruining the mechanism). The idea is to wipe epoxy along the sides and the case surface so that it holds along the perimeter.  
+
+<img src="Photos/Insert_switch_with_Glue.jpg" alt="epoxy squishing out of switch and case" width="400"/>
+
+<img src="Photos/Apply_glue_around_switch.jpg" alt="wipe epoxy around switch" width="400"/>
+
+When you are finished applying epoxy, it should look like this:
+
+<img src="Photos/Epoxy_Fully_Applied.jpg" alt="epoxy completely applied" width="400"/>
+
+### Installer Rubber Boot over 5-way Switch
+Before the epoxy begins to cure (within a couple of minutes), you will want to install the rubber boot over the joystick. To do so, simply press the cap over the switch with a bit of force. Also press around the perimeter of the cap, near the base, so seat it over the base. It requires a little bit of work to get it fully seated. 
+
+<img src="Photos/Press_Cap_onto_Switch.jpg" alt="cap inserted onto switch" width="400"/>
+
+After seating the switch, take your silicone sealant and use another small applicator stick to spread sealant around the edge of the boot and the case surface. However, be careful not to get it too close to where you will install the button. Look carefully around the boot to make sure there are no bubbles and there is a generous amount of sealant around the entirety of the base of the boot, extending to the case.
+
+<img src="Photos/Apply_Sealant_Around_Boot.jpg" alt="sealing boot with silicone" width="400"/>
+
+When you are satisfied, you can gently wipe all four sides with your fingers to smooth out the appearance, but this is not necessary (for asthetic purposes only). Be carefull not to press too hard because you want a generous amount of sealant to remain. 
+
+<img src="Photos/Smooth_Sealant_With_Finger.jpg" alt="smooth sealant" width="400"/>
+
+When everything is completed, it should look like this:
+
+<img src="Photos/Sealed_Switch.jpg" alt="smooth sealant" width="400"/>
 
 

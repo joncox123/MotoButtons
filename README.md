@@ -30,6 +30,10 @@ To build your own Motobuttons Lite, I suggest the following tools and supplies, 
   - Black color is recommended, such as [Permatex 81158](https://www.amazon.com/Permatex-81158-Silicone-Adhesive-Sealant/dp/B000AL6WLA). Can also be found at most auto parts stores for a higher price. If you already have clear silicone, there's no need to buy additional sealant.
 - Alcohol wipes or rubbing alcohol
   - For cleaning the case prior to gluing the navigation joystick. You can obtain these at any grocery or drug store, or [on the internet](https://www.amazon.com/Curad-Alcohol-Prep-Thick-Swabs/dp/B00KOSP454).
+- Small gauge insulated wire
+  - You'll need small gauge (e.g. 26 AWG) wire for soldering the microcontroller to the joystick, buttons and LEDs. If you have an old USB or serial port cable lying around, you can use the wire from there. Otherwise, you can [order wire on the net](https://www.amazon.com/Fermerry-Stranded-Colors-Flexible-electrical/dp/B089CZFDX2).
+- [Soldering iron, solder and related tools](https://www.amazon.com/Soldering-Kit-Temperature-Desoldering-Electronics/dp/B07GTGGLXN)
+  - You'll need an iron with a small, pointed tip and basic tools such as needle nose plyers and tweezers.
 
 ## Parts to Order
 In addition to the tools and supplies mentioned above, you will need to order the parts required to construct Motobuttons Lite. [This link](https://www.mouser.com/ProjectManager/ProjectDetail.aspx?AccessID=e90304f243) will allow you to order the necessary parts from Mouser.com. Also, you can view the [formal Bill of Materials](https://github.com/joncox123/MotoButtons/tree/main/Parts) and data sheets, if interested.

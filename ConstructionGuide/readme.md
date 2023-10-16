@@ -72,11 +72,11 @@ Insert the switch to the holes of the case, making sure not to get any epoxy on 
 
 <img src="Photos/Apply_glue_around_switch.jpg" alt="wipe epoxy around switch" width="400"/>
 
-When you are finished applying epoxy, it should look like this:
+When you are finished applying epoxy, it should look as follows. **You will want to proceed to install the boot, seal the boot and then cure the enclosure upside down fairly quickly, to avoid having epoxy run down the pin holes and cover the electrical contacts.**
 
 <img src="Photos/Epoxy_Fully_Applied.jpg" alt="epoxy completely applied" width="400"/>
 
-### Installer Rubber Boot over 5-way Switch
+### Install Rubber Boot over 5-way Switch
 Before the epoxy begins to cure (within a couple of minutes), you will want to install the rubber boot over the joystick. To do so, simply press the cap over the switch with a bit of force. Also press around the perimeter of the cap, near the base, so seat it over the base. It requires a little bit of work to get it fully seated. 
 
 <img src="Photos/Press_Cap_onto_Switch.jpg" alt="cap inserted onto switch" width="400"/>
@@ -89,8 +89,15 @@ When you are satisfied, you can gently wipe all four sides with your fingers to 
 
 <img src="Photos/Smooth_Sealant_With_Finger.jpg" alt="smooth sealant" width="400"/>
 
-When everything is completed, it should look like this:
+When everything is completed, it should look as follows. Quickly proceed to the next step to cure it upside down.
 
 <img src="Photos/Sealed_Switch.jpg" alt="smooth sealant" width="400"/>
+
+**Turn the case upside down so that it is supported by the switch boot.** Prop up the other side with some material. You can place objects or the epoxy bottles on either side of the case to keep it from tipping over. Place some sort of weight on the case to provide a bit of pressure to cure the switch flush to the case. While the epoxy is mostly cured after about 2 hours, the silicone will take 24 hours, so let the entire arrangement rest undisturbed for 24 hours before proceeding.
+
+You can see in the following photo that I applied a bit too much epoxy, and didn't turn upside down soon enough. As a result, some epoxy began to run down the pins, although there is still some exposed metal that I can solder to.
+
+<img src="Photos/Cure_Epoxy_Upside_Down.jpg" alt="cure upside down" width="400"/>
+
 
 

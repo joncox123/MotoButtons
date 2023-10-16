@@ -6,6 +6,8 @@ As of October of 2023, [all available controllers](https://www.drivemodedashboar
 
 On the other hand, an ideal controller would offer a low price, small size, light weight and a 5-way navigation switch (joystick). The joystick could be used either as a "mouse" (up/down/left/right/click) or to manipulate Drivemode Dashboard functions. 
 
+MotoButtons Lite is for the DIY enthusiast who wants to construct a low cost controller. The trade off is that the Lite version requires careful drilling and gluing to construct the enclosure and waterproof the joystick.
+
 ## Cost and Parts Availability
 As a DIY controller, the MotoButtons Lite has been designed with the highest quality, IP68 (waterproof) parts, while maintaining a low cost. In fact, the necessary parts can be ordered from Mouser.com for only $27.82 plus $7.99 UPS shipping. The only exception is that a low cost, IP68 rated 5-way navigation switch can not be purchased at this time ([this](https://www.digikey.com/en/products/detail/ruffy-controls-inc/HS1-6/17868372) is the least expensive I found, at $76 each). Thus, you will waterproof a $2.50 switch, which is surprisingly rugged and user friendly. In addition, you will need some epoxy glue, basic hole drilling tools and some other basic supplies, which most DIY enthusiasts will have in their garage.
 

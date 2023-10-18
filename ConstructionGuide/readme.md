@@ -9,16 +9,16 @@ First, you'll need to acquire the necessary components, tools and supplies, as m
 First, you need to make the necessary modifications to the Hammond IP68 rated enclosure. While I used a milling machine to do this, it's readily possible with the proper hand tools, technique and attention to detail. At the end of the day, since you will most likely be filling the case with epoxy (potting), is not necessary for everything to be perfect. The sealant, joystick boot and buttons will cover up any minor issues.
 Take a look at the [3D model (3D PDF)](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom%203D.pdf) to get an idea of what you will be doing.
 
-<img src="../Enclosure/enclosure.png" alt="3D model of modified case" width="400"/>
+<img src="../Enclosure/enclosure.png" alt="3D model of modified case" width="600"/>
 
 If you happen to have a milling machine, you can clamp the enclosure (with lid screwed on) in a vise with three layers of duct tape above the parallels.
 
-<img src="Photos/Milling_Machine_Setup.jpg" alt="case in milling machine" width="400"/>
+<img src="Photos/Milling_Machine_Setup.jpg" alt="case in milling machine" width="600"/>
 
 First, print out the [schematic drawing](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom.pdf) of the enclosure, making sure to print as "actual size", so that the print is scaled exactly as indicated. You may want to check the dimensions with a caliper or ruler to verify that you printed it out true to scale. 
 
 <a href="../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom.pdf">
-  <img src="Photos/schematic.png" alt="diagram of modified case" width="400"/>
+  <img src="Photos/schematic.png" alt="diagram of modified case" width="600"/>
 </a>
 
 Cut out the top left diagram titled "Top View (1:1 Scale)" and carefully tape it over the top of the enclosure. Do your best to center it on the case and avoid any wrinkles in the paper. Use an automatic center punch to very precisely create indentations (divots) on the center of each of the 8 holes. This can be done by placing the tip of the center punch directly over the center markings of each hole and pressing down. You might want to practice this step on a piece of plastic or wood as it is easy to misjudge the center of the punch. 
@@ -27,13 +27,13 @@ After you have created the eight marks, carefully clamp the case in a vise [reco
 
 Finally, you will drill the small holes for the electrical pins of the 5-way navigation switch (joystick). This step is challenging to do with a hand drill because the small drill bits tend to break easily with the slightest deflection--so be careful and wear safety glasses. The upper and lower holes will use the #56 bit, and the two "middle" holes will use the smaller #60 bit. **Notice that the two "middle" holes are not exactly in the middle. The orientation of the switch matters!**  When you are done, your case should look as follows:
 
-<img src="Photos/Drill_Holes_in_Case.jpg" alt="Top of case with holes drilled" width="400"/>
+<img src="Photos/Drill_Holes_in_Case.jpg" alt="Top of case with holes drilled" width="600"/>
 
 Before proceeding, test fit the buttons and the navigation switch. **Caution: the switch must be inserted in the six holes with the correct orientation! The two middle holes are closer to one side.**
 
-<img src="Photos/Test_Fit_Parts.jpg" alt="Microcontroller in USB-C slot" width="400"/>
+<img src="Photos/Test_Fit_Parts.jpg" alt="Microcontroller in USB-C slot" width="600"/>
 
-<img src="Photos/Test_Fit_Navigation_Switch.jpg" alt="Microcontroller in USB-C slot" width="400"/>
+<img src="Photos/Test_Fit_Navigation_Switch.jpg" alt="Microcontroller in USB-C slot" width="600"/>
 
 ### Cut Off the Circuit Board Posts (Optional)
 If you ordered the buttons with screw thread mounting, as opposed to the snap on ones, you'll need to cut off two of the PCB mounting posts on the inside of the case. Otherwise, you won't be able to properly tighten the nut to secure the top button. Its possible to omit this step by ordering the snap in buttons, but the waterproofing won't be as good unless you are also potting the case with epoxy. 
@@ -47,57 +47,63 @@ If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durab
 
 The slot for a female USB-C connector is approximately 1/8" (3.18 mm) tall and 9 mm wide (end to end). Therefore, using the center punch, mark two horizontally spaced holes that are 5.83 mm apart by printing out the template and using a center punch or using a caliper. Drill both holes with a 1/8" drill bit. Using a needle file set, carefully file out the slot. You will need to test fit the slot with the microcontroller, as shown below. This will require some trial and error, as it is necessary to file the ends using the round file and the straight edges with a flat file until the connector fits snuggly. I used a milling machine with a 1/8" endmill to do this, although I still had to do manual filing to get the connector to fit.
 
-<img src="Photos/Cut_USB-C_Connector_Slot.jpg" alt="USB-C slot in enclosure" width="400"/>
+<img src="Photos/Cut_USB-C_Connector_Slot.jpg" alt="USB-C slot in enclosure" width="600"/>
 
-<img src="Photos/Test_Fit_Microcontroller.jpg" alt="Microcontroller in USB-C slot" width="400"/>
+<img src="Photos/Test_Fit_Microcontroller.jpg" alt="Microcontroller in USB-C slot" width="600"/>
 
 ## Glue 5-Way Navigation Switch to Case
 Congratulations, you've successfully machined your enclosure! The next step is to glue the joystick to the outside of the case using epoxy glue, and then seal the rubber boot over it with silicone sealant. Begin by assembling your gluing and sealing supplies:
 
-<img src="Photos/Assemble_Gluing_Supplies.jpg" alt="gluing supplies" width="400"/>
+<img src="Photos/Assemble_Gluing_Supplies.jpg" alt="gluing supplies" width="600"/>
 
 First, lightly sand the area on the case where the switch will sit with some 150 grit or similar sand paper. This will help the epoxy stick to the case. Then *very throroughly clean* the case with an alcohol wipe or rubbing alcohol. Blow off any lint that remains. You may also want to wipe down the bottom and sides of the switch with alcohol, especially if you have been handling it. Preparation is key to achieving a durable and waterproof bond. 
 
-<img src="Photos/Scuff_Switch_Gluing_Area.jpg" alt="sanding case" width="400"/>
+<img src="Photos/Scuff_Switch_Gluing_Area.jpg" alt="sanding case" width="600"/>
 
 Mix up a small amount of C-POXY 30 two-part epoxy. This epoxy has an approximately 10 minute working time and takes about two hours to cure (full cure in 24 hours). Using a small stick or applicator, carefully spread a thin layer between the holes on the case, being **careful not to apply epoxy over the holes.** Also apply a **thin layer** of epoxy to the underside of the switch. *Note: the amount applied in the photos is more than you need, just use a thin layer*. 
 
-<img src="Photos/Apply_Epoxy_To_Case.jpg" alt="epoxy on case" width="400"/>
+<img src="Photos/Apply_Epoxy_To_Case.jpg" alt="epoxy on case" width="600"/>
 
-<img src="Photos/Apply_Glue_to_Switch_Bottom.jpg" alt="epoxy on switch" width="400"/>
+<img src="Photos/Apply_Glue_to_Switch_Bottom.jpg" alt="epoxy on switch" width="600"/>
 
 Insert the switch to the holes of the case, making sure not to get any epoxy on the electrical pins. **Observe the proper orientation of the switch, as it is not symmetric top to bottom. The two holes in the "middle" are closer to the bottom side (away from buttons), so line them up before inserting**. A little epoxy should squish out the sides, and you can wipe additional epoxy along the sides of the switch, being careful not to get any on the upper portion (and ruining the mechanism). The idea is to wipe epoxy along the sides and the case surface so that it holds along the perimeter.  
 
-<img src="Photos/Insert_switch_with_Glue.jpg" alt="epoxy squishing out of switch and case" width="400"/>
+<img src="Photos/Insert_switch_with_Glue.jpg" alt="epoxy squishing out of switch and case" width="600"/>
 
-<img src="Photos/Apply_glue_around_switch.jpg" alt="wipe epoxy around switch" width="400"/>
+<img src="Photos/Apply_glue_around_switch.jpg" alt="wipe epoxy around switch" width="600"/>
 
 When you are finished applying epoxy, it should look as follows. **You will want to proceed to install the boot, seal the boot and then cure the enclosure upside down fairly quickly, to avoid having epoxy run down the pin holes and cover the electrical contacts.**
 
-<img src="Photos/Epoxy_Fully_Applied.jpg" alt="epoxy completely applied" width="400"/>
+<img src="Photos/Epoxy_Fully_Applied.jpg" alt="epoxy completely applied" width="600"/>
 
 ### Install Rubber Boot over 5-way Switch
 Before the epoxy begins to cure (within a couple of minutes), you will want to install the rubber boot over the joystick. To do so, simply press the cap over the switch with a bit of force. Also press around the perimeter of the cap, near the base, so seat it over the base. It requires a little bit of work to get it fully seated. 
 
-<img src="Photos/Press_Cap_onto_Switch.jpg" alt="cap inserted onto switch" width="400"/>
+<img src="Photos/Press_Cap_onto_Switch.jpg" alt="cap inserted onto switch" width="600"/>
 
 After seating the switch, take your silicone sealant and use another small applicator stick to spread sealant around the edge of the boot and the case surface. However, be careful not to get it too close to where you will install the button. Look carefully around the boot to make sure there are no bubbles and there is a generous amount of sealant around the entirety of the base of the boot, extending to the case.
 
-<img src="Photos/Apply_Sealant_Around_Boot.jpg" alt="sealing boot with silicone" width="400"/>
+<img src="Photos/Apply_Sealant_Around_Boot.jpg" alt="sealing boot with silicone" width="600"/>
 
 When you are satisfied, you can gently wipe all four sides with your fingers to smooth out the appearance, but this is not necessary (for asthetic purposes only). Be carefull not to press too hard because you want a generous amount of sealant to remain. 
 
-<img src="Photos/Smooth_Sealant_With_Finger.jpg" alt="smooth sealant" width="400"/>
+<img src="Photos/Smooth_Sealant_With_Finger.jpg" alt="smooth sealant" width="600"/>
 
 When everything is completed, it should look as follows. Quickly proceed to the next step to cure it upside down.
 
-<img src="Photos/Sealed_Switch.jpg" alt="smooth sealant" width="400"/>
+<img src="Photos/Sealed_Switch.jpg" alt="smooth sealant" width="600"/>
 
 **Turn the case upside down so that it is supported by the switch boot.** Prop up the other side with some material. You can place objects or the epoxy bottles on either side of the case to keep it from tipping over. Place some sort of weight on the case to provide a bit of pressure to cure the switch flush to the case. While the epoxy is mostly cured after about 2 hours, the silicone will take 24 hours, so let the entire arrangement rest undisturbed for 24 hours before proceeding.
 
 You can see in the following photo that I applied a bit too much epoxy, and didn't turn upside down soon enough. As a result, some epoxy began to run down the pins, although there is still some exposed metal that I can solder to.
 
-<img src="Photos/Cure_Epoxy_Upside_Down.jpg" alt="cure upside down" width="400"/>
+<img src="Photos/Cure_Epoxy_Upside_Down.jpg" alt="cure upside down" width="600"/>
 
+## Installing Buttons and Soldering Wires
+Nearing the completition of construction, we will solder the wires and install the two remaining buttons in this section.
 
+### Soldering Wires to 5-Way Switch
+With some color coded small gauge wire (approximately 26 AWG), "tin" each of the six pins and six wire segments of about 4 cm each. Solder the wires to each of the six pins. The switch pinout is shown in the photo below. Looking from the inside of the case, with the two buttons oriented up, the pinout clockwise from the upper left pin is: center, up, left, down, common, right. If viewed from the outside front of the case, the "left" pin will be on the left side and the "up" pin will face up, assuming the two buttons are on the top (direction of arrow). 
+
+<img src="Photos/SolderWires5WaySwitch.jpg" alt="soldering wires to 5-way switch and pinout" width="600"/>
 

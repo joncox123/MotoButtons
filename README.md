@@ -54,3 +54,6 @@ In addition to the tools and supplies mentioned above, you will need to order th
 
 ## Instructions
 Complete [step-by-step instructions](https://github.com/joncox123/MotoButtons/tree/main/ConstructionGuide) for building your own MotoButtons Lite are available. If you have questions, concerns or suggestions, [please create a new issue](https://github.com/joncox123/MotoButtons/issues) in this GitHub repository.
+
+### User Guide
+Operation is simple, but [see the user guide.](https://github.com/joncox123/MotoButtons/blob/main/UserGuide/readme.md)

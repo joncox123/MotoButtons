@@ -42,7 +42,15 @@ If you ordered the buttons with screw thread mounting, as opposed to the snap on
 
 Use a dremel with a small cut off wheel to cut off the upper posts. Then sand the area flat using a sanding wheel. *I used a milling machine and a 7/32" end mill to do this step, so it might be a good idea to omit this step unless you are confident in your abilities and tools.*
 
-### Machine the USB-C Connector Slot (Optional)
+## Power Entry
+This section describes two options for power the device. By the way, this microcontroller has integrated functionality for charging a lithium battery. While this guide does not describe such a version, it could be easily built by soldering a small battery to the proper terminals.
+
+### Drill Hole for Power Wires (Option 1)
+The easiest option to power the device, which does not require machining a slot for the USB-C connector, is to drill a hole on the end for the power wires. This option is also the easiest to seal, as after you run the wires through the end of the case, you only need to apply a bit of sealant on the inside and outside of the wires. 
+
+Since the microcontroller requires 5 Volt power, the easiest way to power it is via an old USB cable, assuming you also have a USB port on your bike. Thus, you could take an old cable, cut the end off, and solder the ground and power wire to the GND and 5V pads on the microcontroller, as described near the end of this guide.
+
+### Machine the USB-C Connector Slot (Option 2)
 If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durability and waterproofing, you may wish to cut a slot for the USB-C connector on the microcontroller. This will allow you to update the firmware in the future, should additional functionality become available (or if you wish to modify the source code yourself). 
 
 The slot for a female USB-C connector is approximately 1/8" (3.18 mm) tall and 9 mm wide (end to end). Therefore, using the center punch, mark two horizontally spaced holes that are 5.83 mm apart by printing out the template and using a center punch or using a caliper. Drill both holes with a 1/8" drill bit. Using a needle file set, carefully file out the slot. You will need to test fit the slot with the microcontroller, as shown below. This will require some trial and error, as it is necessary to file the ends using the round file and the straight edges with a flat file until the connector fits snuggly. I used a milling machine with a 1/8" endmill to do this, although I still had to do manual filing to get the connector to fit.
@@ -121,13 +129,34 @@ Study the [wiring diagram](CaseConnections.pdf) shown below:
 
 You will solder the wires to the pins, which are labeled on the back of the microcontroller, as shown in the diagram. The pinout of the microcontroller, as viewed from the top, is shown in the upper right of the diagram. However, twist the three 3V3 (power) wires together and solder them to the back of the 3V3 pad. The rest of the wires are individually soldered to the indicated pad on the microcontroller.
 
+### Solder 5 Volt Power Cable (Option 1)
+If you decided to solder an old USB cable to the microcontroller for power, instead of making a slot for the USB-C connector, you should do this now. As a guide, [see this page](https://www.electroschematics.com/usb-how-things-work/) for the pinout of a USB cable. To identify ground and power, you can plug it in and use a multimeter to see which pin is grounded and which has +5V.
+
+<img src="Photos/usb-wiring-connection.jpg" alt="USB cable pinout" width="600"/>
+
 ## Install in Case
 After soldering all wires, gently bend over the remaining button LED leads such that they do not short to any other pins. Wrap the wires carefully around the buttons in the case as shown below. Press them into the case so that they won't get caught in the case lip when you screw the lid on (otherwise you will pinch your wires and there will be a gap in the lid's waterproof seal).
 
 <img src="Photos/MicrocontrollerInCase.jpg" alt="wires wrapped into case" width="600"/>
 
 ## Upload the Microcontroller Software
-To be completed.
+The easiest way to do this would be with a custom installer. However, that work is not yet done, so you will need to [download the Arduino IDE](https://www.arduino.cc/en/software), install the support package for the microcontroller, and then upload via a USB cable. The installation steps are [described here.](https://wiki.seeedstudio.com/XIAO_BLE/#getting-started)
+
+First, open the Arduino IDE and then open Preferences in the File menu. Paste the URL to the microcontroller board support package into the "Additional board managers URLs" text field. Click OK.
+
+<img src="Photos/AddBSP.PNG" alt="add Seeed BSP" width="600"/>
+
+Second, install the Seeed nRF Boards package by clicking on the side button that is second from the top, to open the Board Manager. Type "nRF" into the search field at the top and install the "Seeed nRF52 Boards" package. 
+
+<img src="Photos/InstallBSP.PNG" alt="install Seeed BSP" width="600"/>
+
+Third, [download the source code file](../ArduinoCode/MotoButtonsLite.ino) and open in the Arduino IDE. Attach the microcontroller via a USB-C cable. Select the board that you just attached with the drop down box in the upper toolbar. It should say "Seeed XIAO nRF52840".
+
+Finally, click the upload button!
+
+<img src="Photos/upload.png" alt="install Seeed BSP" width="600"/>
+
+Note, the microcontroller's firmware appears to have a bug whereby it is not always possible to upload new software. If this occurs, you will get a message in the Arduino IDE output saying "unable to upload in DFU mode", or something similar. If this happens, you need to depress the tiny reset button on the microcontroller (using a small tool or pencil). Hold it down, then release and very quickly and double click it rapidly. This will cause the internal memory to be mounted as a disk drive on your computer. Next, close the Arduino IDE and relaunch it. You should be able to upload again. I am currently researching whether it is possible to solve this issue, or bypass it with another upload process.
 
 ## Sealing the Case
 At this point, you are ready to close the case. However, you have a couple of options to consider before proceeding. Since MotoButtons is currently under active development, you may not want to epoxy fill the case just yet. The reason is, the Seeed XIAO microcontroller has a bug that sometimes occurs and makes it impossible to re-upload the software without double tapping the reset button on the microcontroller. Until this is resolved, I recommend not permanetly gluing the microcontroller in the case. 
@@ -136,5 +165,8 @@ Therefore, if you milled a slot for the USB-C connector, I recommend using some 
 
 To update the firmware in the future, you will need to plug a USB-C cable into the microcontroller. At the present time, I am researching options for OTA updates and/or fixing the bug that prevents reliable firmware upload without hitting the tiny reset button on the top side of the microcontroller.
 
+## Mounting to the Motorcycle
+Now that you've completed your build, and hopefully tested it successfully with the DMD2 beta app, you are ready to mount it on the motorcycle. This is the perfect time to be creative and figure out new and better ways to mount the unit. One simple option is to use waterproof, double sided mounting tape to adhere it to the switchgear on the right hand side, for example. You could also adhere it to any other relatively flat surface, including one attached to a RAM ball mount. If you are ambitious, you could attach it to a standard handlebar clamp mount with a screw and bolt or inserting a stud into the case and filling with epoxy. The options are endless.
 
+<img src="Photos/MotoButtonsLiteMounted.jpg" alt="motobuttons lite installed on handlebar" width="800"/>
 

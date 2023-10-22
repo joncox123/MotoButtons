@@ -40,11 +40,12 @@ const char BLE_DEVICE_NAME[] = "DMD2 CTL 7K";
 const char BLE_DEVICE_MODEL[] = "MotoButtons Lite v1";
 const char BLE_MANUFACTURER[] = "DIY";
 #define BLE_TX_POWER 8
+bool BLE_connected = false;
 
 //Mouse
-#define MOUSE_RATE_SLOW 20
-#define MOUSE_RATE_FAST 80
-#define MOUSE_RATE_DELAY 750
+#define MOUSE_RATE_SLOW 10
+#define MOUSE_RATE_FAST 40
+#define MOUSE_RATE_DELAY 500
 #define MODE_TOGGLE_MS 1000
 bool mouse_mode = false;
 bool mouse_buttons_release = true;
@@ -267,6 +268,7 @@ void setup()
 
   Serial.println("Setup complete.");
   digitalWrite(LED_BUTTON_A, HIGH);
+  digitalWrite(LED_BUTTON_B, HIGH);
 }
 
 void startAdv(void)
@@ -302,11 +304,27 @@ bool button_is_pressed() {
   return button_up_state || button_down_state || button_left_state || button_right_state || button_center_state || button_A_state || button_B_state;
 }
 
+// This loop only runs once BLE is connected to a host
 void loop() 
 {
+  // Indicate whether the device is connected and running
+  if (!BLE_connected && (Bluefruit.connected() > 0)) {
+    Serial.println("BLE connected to host.");
+    digitalWrite(LED_BUTTON_A, LOW);
+    digitalWrite(LED_BUTTON_B, LOW);
+    BLE_connected = true;
+  }
+  else if (Bluefruit.connected() == 0) {
+    digitalToggle(LED_BUTTON_A);
+    digitalToggle(LED_BUTTON_B);
+    delay(125);
+    BLE_connected = false;
+  }
+
   updateButtons();
 
-  if (mouse_mode) {
+  // Event handler for BLE related actions
+  if (mouse_mode && BLE_connected) {
     // handle mouse click release
     if ((!button_center_state && button_center_flipped) || (!button_B_state && button_B_flipped) && mouse_left_button_pressed) {
       Serial.println("Mouse left release.");
@@ -347,7 +365,7 @@ void loop()
         blehid.mouseMove(rate, 0);
     }
   }
-  else if (keyReportChanged) {
+  else if (keyReportChanged && BLE_connected) {
     blehid.keyboardReport(0, keyReport);
   }
 }

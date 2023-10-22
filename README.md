@@ -34,7 +34,7 @@ To build your own Motobuttons Lite, I suggest the following tools and supplies, 
 - Alcohol wipes or rubbing alcohol
   - For cleaning the case prior to gluing the navigation joystick. You can obtain these at any grocery or drug store, or [on the internet](https://www.amazon.com/Curad-Alcohol-Prep-Thick-Swabs/dp/B00KOSP454).
 - Small gauge insulated wire
-  - You'll need small gauge (e.g. 26 AWG) wire for soldering the microcontroller to the joystick, buttons and LEDs. If you have an old USB or serial port cable lying around, you can use the wire from there. Otherwise, you can [order wire on the net](https://www.amazon.com/Fermerry-Stranded-Colors-Flexible-electrical/dp/B089CZFDX2).
+  - You'll need small gauge (e.g. 22-26 AWG) wire for soldering the microcontroller to the joystick, buttons and LEDs. If you have an old USB or serial port cable lying around, you can use the wire from there. Otherwise, you can [order wire on the net](https://www.amazon.com/Fermerry-Stranded-Colors-Flexible-electrical/dp/B089CZFDX2).
 - [Soldering iron, solder and related tools](https://www.amazon.com/Soldering-Kit-Temperature-Desoldering-Electronics/dp/B07GTGGLXN)
   - You'll need an iron with a small, pointed tip and basic tools such as needle nose plyers and tweezers.
 

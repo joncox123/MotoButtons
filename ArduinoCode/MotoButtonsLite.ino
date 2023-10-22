@@ -1,5 +1,6 @@
 /*********************************************************************
 author: joncox@alum.mit.edu
+License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
 *********************************************************************/
 #include <bluefruit.h>
 
@@ -24,7 +25,7 @@ const uint8_t HIDKEY_UP     = HID_KEY_ARROW_UP;
 const uint8_t HIDKEY_DOWN   = HID_KEY_ARROW_DOWN;
 const uint8_t HIDKEY_LEFT   = HID_KEY_ARROW_LEFT;
 const uint8_t HIDKEY_RIGHT  = HID_KEY_ARROW_RIGHT;
-const uint8_t HIDKEY_CENTER = HID_KEY_RETURN;
+const uint8_t HIDKEY_CENTER = HID_KEY_ENTER;
 const uint8_t HIDKEY_A      = HID_KEY_F6;
 const uint8_t HIDKEY_B      = HID_KEY_F7;
 #define N_KEY_REPORT 6
@@ -32,8 +33,8 @@ uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE , HID_KEY_NONE , H
 bool keyReportChanged = false;
 
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 7K";
-const char BLE_DEVICE_MODEL[] = "Pad_v1";
-const char BLE_MANUFACTURER[] = "joncox";
+const char BLE_DEVICE_MODEL[] = "DMD2 CTL 7K";
+const char BLE_MANUFACTURER[] = "DMD2 CTL 7K";
 #define BLE_TX_POWER 8
 
 //Mouse
@@ -130,6 +131,11 @@ bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *bu
     return stateChanged;
 }
 
+void releaseAllKeys() {
+  uint8_t keyReportRelease[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE};
+  blehid.keyboardReport(0, keyReportRelease);
+}
+
 void updateButtons() {
   bool stateChanged = false;
 
@@ -155,6 +161,7 @@ void updateButtons() {
     mouse_buttons_release = false;
     blehid.mouseButtonRelease();
     if (mouse_mode) {
+      releaseAllKeys();
       Serial.println("Mouse mode activated.");
       for (unsigned int i = 0; i < 10; i++) {
         digitalToggle(LED_BUTTON_A);
@@ -263,7 +270,7 @@ void startAdv(void)
   // Advertising packet
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
-  Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_HID_MOUSE);
+  //Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_HID_MOUSE);
   Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_HID_KEYBOARD);
   
   // Include BLE HID service

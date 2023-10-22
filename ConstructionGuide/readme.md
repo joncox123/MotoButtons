@@ -3,7 +3,7 @@ Building your own MotoButtons Lite requires no programming experience, only rela
 
 ## Be Prepared
 ### Disclaimer
-No warranty or implied fitness for any use is provided and the authors assume no liability for any failures or accidents that occur. You assume all risk of building or operating MotoButtons. The controller should never be used while the vehicle is in motion to reduce the risk of a collision or accident. Operating a motorcycle, working with tools and chemicals is an inherently risky activity and should only be attempted by qualified and experienced people. By proceeding, you agree to assume all risk associated with construction and operation of MotoButtons.
+No warranty or implied fitness for any use is provided and the authors assume no liability for any failures or accidents that occur. You assume all risk of building or operating MotoButtons. The controller should never be used while the vehicle is in motion to reduce the risk of a collision or accident. Operating a motorcycle, working with tools and chemicals is an inherently dangerous activity and should only be attempted by qualified and experienced people. By proceeding, you agree to assume all risk associated with construction and operation of MotoButtons.
 
 ### Gather Supplies and Tools
 First, you'll need to acquire the necessary components, tools and supplies, as mentioned on the [main page](https://github.com/joncox123/MotoButtons/tree/main#recommended-tools-and-supplies). Most DIY enthusiasts will have many of these tools and supplies, except for the parts from Mouser, the slow curing epoxy, and the necessary drill bits.

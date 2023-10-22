@@ -1,5 +1,5 @@
 /*********************************************************************
-author: joncox@alum.mit.edu, copyright 2023.
+author: joncox@alum.mit.edu
 *********************************************************************/
 #include <bluefruit.h>
 
@@ -37,22 +37,24 @@ const char BLE_MANUFACTURER[] = "joncox";
 #define BLE_TX_POWER 8
 
 //Mouse
-#define MOUSE_RATE_SLOW 10
-#define MOUSE_RATE_FAST 40
-#define MOUSE_RATE_DELAY 1000
+#define MOUSE_RATE_SLOW 20
+#define MOUSE_RATE_FAST 80
+#define MOUSE_RATE_DELAY 750
 #define MODE_TOGGLE_MS 1000
 bool mouse_mode = false;
+bool mouse_buttons_release = true;
+bool mouse_left_button_pressed = false;
 
 // Digital IO pin mapping
-#define BUTTON_UP      0
-#define BUTTON_DOWN    1
-#define BUTTON_LEFT    2
-#define BUTTON_RIGHT   3
-#define BUTTON_CENTER  4
-#define BUTTON_A       5
-#define BUTTON_B       6
-#define LED_BUTTON_A   7
-#define LED_BUTTON_B   8
+#define BUTTON_UP      2
+#define BUTTON_DOWN    4
+#define BUTTON_LEFT    3
+#define BUTTON_RIGHT   0
+#define BUTTON_CENTER  1
+#define BUTTON_A       6
+#define BUTTON_B       5
+#define LED_BUTTON_A   8
+#define LED_BUTTON_B   7
 
 #define DEBOUNCE_TIME_MS 20
 
@@ -114,11 +116,13 @@ bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *bu
       *state = reading;
       *buttonFlipped = true;
 
+      /*
       Serial.print(buttonName);
       if (*state)
         Serial.println(" button pressed.");
       else
         Serial.println(" button released.");
+      */
     }
 
     *priorState = reading;
@@ -137,20 +141,38 @@ void updateButtons() {
   stateChanged |= debounceButton(BUTTON_A, &button_A_state, &button_A_state_prior, &button_A_flipped, &button_A_time, "A");
   stateChanged |= debounceButton(BUTTON_B, &button_B_state, &button_B_state_prior, &button_B_flipped, &button_B_time, "B");
 
-  // Check whether mouse mode should be toggled
-  if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS)) {
-    mouse_mode != mouse_mode;
-    digitalWrite(LED_BUTTON_B, mouse_mode);
+  keyReportChanged = stateChanged;
+
+  // Check for release of mouse mode button combination
+  if (!button_A_state || !button_B_state) {
+    //Serial.println("Mouse mode buttons released.");
+    mouse_buttons_release = true;
+  }
+
+  // Toggle mouse mode
+  if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS) && mouse_buttons_release) {
+    mouse_mode = !mouse_mode;
+    mouse_buttons_release = false;
     blehid.mouseButtonRelease();
-    if (mouse_mode)
+    if (mouse_mode) {
       Serial.println("Mouse mode activated.");
-    else
+      for (unsigned int i = 0; i < 10; i++) {
+        digitalToggle(LED_BUTTON_A);
+        digitalToggle(LED_BUTTON_B);
+        delay(200);
+      }
+    }
+    else {
       Serial.println("Mouse mode deactivated.");
+      for (unsigned int i = 0; i < 4; i++) {
+        digitalToggle(LED_BUTTON_A);
+        digitalToggle(LED_BUTTON_B);
+        delay(500);
+      }
+    }
   }
 
   if (stateChanged) {
-    keyReportChanged = stateChanged;
-
     // Update the HID keyboard report with all pressed keys
     unsigned int i = 0;
     if (button_up_state && !mouse_mode) {
@@ -182,27 +204,32 @@ void updateButtons() {
       ++i;
     }
 
-    for (int j = i; i < N_KEY_REPORT; j++) {
+    for (unsigned int j = i; j < N_KEY_REPORT; j++) {
       keyReport[j] = HID_KEY_NONE;
     }
   }
 }
 
 void setupDigitalIO() {
-  pinMode(BUTTON_UP,      INPUT);
-  pinMode(BUTTON_DOWN,    INPUT);
-  pinMode(BUTTON_LEFT,    INPUT);
-  pinMode(BUTTON_RIGHT,   INPUT);
-  pinMode(BUTTON_CENTER,  INPUT);
-  pinMode(BUTTON_A,       INPUT);
-  pinMode(BUTTON_B,       INPUT);
+  pinMode(BUTTON_UP,      INPUT_PULLDOWN);
+  pinMode(BUTTON_DOWN,    INPUT_PULLDOWN);
+  pinMode(BUTTON_LEFT,    INPUT_PULLDOWN);
+  pinMode(BUTTON_RIGHT,   INPUT_PULLDOWN);
+  pinMode(BUTTON_CENTER,  INPUT_PULLDOWN);
+  pinMode(BUTTON_A,       INPUT_PULLDOWN);
+  pinMode(BUTTON_B,       INPUT_PULLDOWN);
 
   pinMode(LED_BUTTON_A,   OUTPUT);
   pinMode(LED_BUTTON_B,   OUTPUT);
+
+  digitalWrite(LED_BUTTON_A, LOW);
+  digitalWrite(LED_BUTTON_B, LOW);
 }
 
 void setup() 
 {
+  setupDigitalIO();
+
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
@@ -227,9 +254,8 @@ void setup()
   // Set up and start advertising
   startAdv();
 
-  setupDigitalIO();
-
   Serial.println("Setup complete.");
+  digitalWrite(LED_BUTTON_A, HIGH);
 }
 
 void startAdv(void)
@@ -259,38 +285,46 @@ void startAdv(void)
   Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
   Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
+}
 
-  digitalWrite(LED_BUTTON_A, HIGH);
+bool button_is_pressed() {
+  return button_up_state || button_down_state || button_left_state || button_right_state || button_center_state || button_A_state || button_B_state;
 }
 
 void loop() 
 {
   updateButtons();
 
-  if (keyReportChanged) {
-    blehid.keyboardReport(0, keyReport);
+  if (mouse_mode) {
+    // handle mouse click release
+    if ((!button_center_state && button_center_flipped) || (!button_B_state && button_B_flipped) && mouse_left_button_pressed) {
+      Serial.println("Mouse left release.");
+      blehid.mouseButtonRelease();
+      button_center_flipped = false;
+      button_B_flipped = false;
+      mouse_left_button_pressed = false;
+    }
 
-    if (mouse_mode) {
-      // Handle click and release
-      if (button_center_state && button_center_flipped) {
+    if (button_is_pressed()) {
+      // Handle click
+      if ((button_center_state && button_center_flipped) || (button_B_state && button_B_flipped) && !mouse_left_button_pressed) {
         Serial.println("Mouse left click.");
         blehid.mouseButtonPress(MOUSE_BUTTON_LEFT);
         button_center_flipped = false;
-      }
-      else if (!button_center_state && button_center_flipped) {
-        Serial.println("Mouse left release.");
-        blehid.mouseButtonRelease();
-        button_center_flipped = false;
+        button_B_flipped = false;
+        mouse_left_button_pressed = true;
       }
 
       // Move pointer
       int rate = MOUSE_RATE_SLOW;
       unsigned long currTimeMs = millis();
-      if ((currTimeMs - button_up_time > MOUSE_RATE_DELAY) ||
-          (currTimeMs - button_down_time > MOUSE_RATE_DELAY) ||
-          (currTimeMs - button_left_time > MOUSE_RATE_DELAY) ||
-          (currTimeMs - button_right_time > MOUSE_RATE_DELAY))
+      if (((currTimeMs - button_up_time > MOUSE_RATE_DELAY) && button_up_state) ||
+          ((currTimeMs - button_down_time > MOUSE_RATE_DELAY) && button_down_state) ||
+          ((currTimeMs - button_left_time > MOUSE_RATE_DELAY) && button_left_state) ||
+          ((currTimeMs - button_right_time > MOUSE_RATE_DELAY) && button_right_state))
         rate = MOUSE_RATE_FAST;
+      else
+        rate = MOUSE_RATE_SLOW;
 
       if (button_up_state)
         blehid.mouseMove(0, -rate);
@@ -300,8 +334,9 @@ void loop()
         blehid.mouseMove(-rate, 0);
       if (button_right_state)
         blehid.mouseMove(rate, 0);
-
     }
   }
+  else if (keyReportChanged) {
+    blehid.keyboardReport(0, keyReport);
+  }
 }
-

@@ -142,7 +142,7 @@ After soldering all wires, gently bend over the remaining button LED leads such 
 ## Upload the Microcontroller Software
 The easiest way to do this would be with a custom installer. However, that work is not yet done, so you will need to [download the Arduino IDE](https://www.arduino.cc/en/software), install the support package for the microcontroller, and then upload via a USB cable. The installation steps are [described here.](https://wiki.seeedstudio.com/XIAO_BLE/#getting-started)
 
-First, open the Arduino IDE and then open Preferences in the File menu. Paste the URL to the microcontroller board support package into the "Additional board managers URLs" text field. Click OK.
+First, open the Arduino IDE and then open Preferences in the File menu. Paste the URL (https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json) to the microcontroller board support package into the "Additional board managers URLs" text field. Click OK. 
 
 <img src="Photos/AddBSP.PNG" alt="add Seeed BSP" width="600"/>
 

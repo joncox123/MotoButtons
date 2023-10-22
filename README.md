@@ -1,8 +1,8 @@
 # MotoButtons Lite
 A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) motorcycle navigation with joystick and mouse mode.
 **At this time, you must [install the DMD2 beta version](https://youtu.be/bJglvH23oGI?feature=shared&t=128) from the Google Play Store by joining the DMD2 beta program at the button of the DMD2 app page in the Play Store**
-
 <img src="ConstructionGuide/Photos/MotoButtonsLiteMounted.jpg" alt="motobuttons lite installed on handlebar" width="800"/>
+*The full version of MotoButtons will feature a IP68 rated 4-way castle switch and will be easier to construct (no sealing or fine hole drilling required), but the parts will cost about $29 additional. Stay tuned*
 
 ## Why a DIY controller?
 As of October of 2023, [all available controllers](https://www.drivemodedashboard.com/certified-remote-controllers/) for Drivemode Dashboard are rather expensive, especially if shipped outside of Europe, or do not offer the ideal functionality in a small size. The [least expensive controller](https://www.thorkracing.com/produto/arn-remote-pro/) that is in stock and can be shipped to the USA costs $215 USD with shipping. Since many riders have two, three or even four motorcycles, the total cost could be as high as $683, just for a set of basic controllers! However, even this controller only offers a two-way switch, so functionality is limited. 

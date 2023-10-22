@@ -32,9 +32,13 @@ const uint8_t HIDKEY_B      = HID_KEY_F7;
 uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE};
 bool keyReportChanged = false;
 
+/* Device Information
+  The non-beta version of DMD2 has a whitelist of controller names that it will recognize. Until MotoButtons Lite is certified,
+  you will need to install the beta version of DMD2.
+*/
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 7K";
-const char BLE_DEVICE_MODEL[] = "DMD2 CTL 7K";
-const char BLE_MANUFACTURER[] = "DMD2 CTL 7K";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite v1";
+const char BLE_MANUFACTURER[] = "DIY";
 #define BLE_TX_POWER 8
 
 //Mouse

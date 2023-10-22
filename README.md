@@ -1,5 +1,5 @@
 # MotoButtons Lite
-A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) motorcycle navigation.
+A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) motorcycle navigation with joystick and mouse mode.
 **At this time, you must [install the DMD2 beta version](https://youtu.be/bJglvH23oGI?feature=shared&t=128) from the Google Play Store by joining the DMD2 beta program at the button of the DMD2 app page in the Play Store**
 
 ## Why a DIY controller?

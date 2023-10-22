@@ -100,10 +100,28 @@ You can see in the following photo that I applied a bit too much epoxy, and didn
 <img src="Photos/Cure_Epoxy_Upside_Down.jpg" alt="cure upside down" width="600"/>
 
 ## Installing Buttons and Soldering Wires
-Nearing the completition of construction, we will solder the wires and install the two remaining buttons in this section.
+First, install the two buttons. Place the O-ring in the groove, then insert the buttons into the case. Place the lock washer and the nut over the back of the buttons and tighten gently (but firmly) with a 14 mm socket. **Make sure to align the buttons such that the two *shorter* wire leads face inward. These are the LED negative (-) terminals.**
 
 ### Soldering Wires to 5-Way Switch
 With some color coded small gauge wire (approximately 26 AWG), "tin" each of the six pins and six wire segments of about 4 cm each. Solder the wires to each of the six pins. The switch pinout is shown in the photo below. Looking from the inside of the case, with the two buttons oriented up, the pinout clockwise from the upper left pin is: center, up, left, down, common, right. If viewed from the outside front of the case, the "left" pin will be on the left side and the "up" pin will face up, assuming the two buttons are on the top (direction of arrow). 
 
 <img src="Photos/SolderWires5WaySwitch.jpg" alt="soldering wires to 5-way switch and pinout" width="600"/>
+
+### Solder Wires to Buttons and Button LEDs
+Make sure the buttons are rotated so that the two shorter leads face inward. These are the LED negative (-) pins that you will connect to ground. Solder wires to each of the button leads, except **bridge the two short LED leads together by soldering both with a single ground wire (see photos).** 
+
+<img src="Photos/SolderButtonWires.jpg" alt="all wires soldered to buttons and joystick" width="600"/>
+
+## Solder All Wires to Microcontroller
+Study the [wiring diagram](CaseConnections.pdf) shown below:
+
+<img src="CaseConnections.png" alt="wiring diagram"/>
+
+You will solder the wires to the pins, which are labeled on the back of the microcontroller, as shown in the diagram. The pinout of the microcontroller, as viewed from the top, is shown in the upper right of the diagram. However, twist the three 3V3 (power) wires together and solder them to the back of the 3V3 pad. The rest of the wires are individually soldered to the indicated pad on the microcontroller.
+
+## Close the Case
+After soldering all wires, gently bend over the remaining button LED leads such that they do not short to any other pins. Wrap the wires carefully around the buttons in the case as shown below. Press them into the case so that they won't get caught in the case lip when you screw the lid on (otherwise you will pinch your wires and there will be a gap in the lid's waterproof seal).
+
+<img src="Photos/SolderButtonWires.jpg" alt="wires wrapped into case" width="600"/>
+
 

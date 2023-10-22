@@ -110,6 +110,8 @@ With some color coded small gauge wire (approximately 26 AWG), "tin" each of the
 ### Solder Wires to Buttons and Button LEDs
 Make sure the buttons are rotated so that the two shorter leads face inward. These are the LED negative (-) pins that you will connect to ground. Solder wires to each of the button leads, except **bridge the two short LED leads together by soldering both with a single ground wire (see photos).** 
 
+Also, you may want to put a piece of heat shrink tubing over the bottom most LED wire for Button B. This can prevent it from shorting out on either the microcontroller or the other pins on the button. If you don't have a small diameter piece of heat shrink, you can put a bit of electrical tape around it.
+
 <img src="Photos/SolderButtonWires.jpg" alt="all wires soldered to buttons and joystick" width="600"/>
 
 ## Solder All Wires to Microcontroller
@@ -119,9 +121,20 @@ Study the [wiring diagram](CaseConnections.pdf) shown below:
 
 You will solder the wires to the pins, which are labeled on the back of the microcontroller, as shown in the diagram. The pinout of the microcontroller, as viewed from the top, is shown in the upper right of the diagram. However, twist the three 3V3 (power) wires together and solder them to the back of the 3V3 pad. The rest of the wires are individually soldered to the indicated pad on the microcontroller.
 
-## Close the Case
+## Install in Case
 After soldering all wires, gently bend over the remaining button LED leads such that they do not short to any other pins. Wrap the wires carefully around the buttons in the case as shown below. Press them into the case so that they won't get caught in the case lip when you screw the lid on (otherwise you will pinch your wires and there will be a gap in the lid's waterproof seal).
 
-<img src="Photos/SolderButtonWires.jpg" alt="wires wrapped into case" width="600"/>
+<img src="Photos/MicrocontrollerInCase.jpg" alt="wires wrapped into case" width="600"/>
+
+## Upload the Microcontroller Software
+To be completed.
+
+## Sealing the Case
+At this point, you are ready to close the case. However, you have a couple of options to consider before proceeding. Since MotoButtons is currently under active development, you may not want to epoxy fill the case just yet. The reason is, the Seeed XIAO microcontroller has a bug that sometimes occurs and makes it impossible to re-upload the software without double tapping the reset button on the microcontroller. Until this is resolved, I recommend not permanetly gluing the microcontroller in the case. 
+
+Therefore, if you milled a slot for the USB-C connector, I recommend using some hot glue to temporarily seal and fix the microcontroller in the case. If you opted to simply drill a small hole for two power wires (connected to GND and 5V), then you can apply sealant to the power wire holes to make it waterproof, then screw the lid on. 
+
+To update the firmware in the future, you will need to plug a USB-C cable into the microcontroller. At the present time, I am researching options for OTA updates and/or fixing the bug that prevents reliable firmware upload without hitting the tiny reset button on the top side of the microcontroller.
+
 
 

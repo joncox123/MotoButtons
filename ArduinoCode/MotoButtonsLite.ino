@@ -1,55 +1,76 @@
 /*********************************************************************
 author: joncox@alum.mit.edu
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
+Version: 1.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
 
 BLEDis bledis;
 BLEHidAdafruit blehid;
 
-// Key codes to send for button presses
+// BLE configuration
+#define BLE_TX_POWER 8
+const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.1";
+const char BLE_MANUFACTURER[] = "Me";
+bool BLE_connected = false;
+
+/* 
+ * --------------------- MODE CONFIGURATION ----------------------------
+ * 	DMD2: up/down/left/right arrows, enter, F6 and F7
+ * 	Mouse: mouse up/down/left/right, left click, left click, ?
+ * 	MRA: up/down/left/right arrows, 'c', -, +, longpress center for 'n'
+ */
+// Selected Mode: indicates the currently selected operating mode
+#define MODE_TOGGLE_MS 1000
+#define N_MODES 3
+enum Mode {
+	DMD2 = 0,
+	mouse = 1,
+	MRA = 2
+};
+enum Mode currentMode;
+
+bool modeButtonsReleased = true;
+
+/* DMD2 Mode Configuration */
 // https://www.drivemodedashboard.com/controller-implementation-guide/
 // https://arduino.stackexchange.com/questions/65513/how-do-i-send-non-ascii-keys-over-the-ble-hid-connection-using-an-adafruit-nrf52
 // https://github.com/adafruit/Adafruit_nRF52_Arduino/blob/200b3aaefb3256ac26df82ebc9b5b58923d9c37c/cores/nRF5/Adafruit_TinyUSB_Core/tinyusb/src/class/hid/hid.h#L188
 // https://github.com/adafruit/Adafruit_nRF52_Arduino/issues/785
-/* DMD HID android key events
-KEYCODE_ENTER
-KEYCODE_DPAD_LEFT
-KEYCODE_DPAD_RIGHT
-KEYCODE_DPAD_UP
-KEYCODE_DPAD_DOWN
-KEYCODE_F6
-KEYCODE_F7
-*/
-const uint8_t HIDKEY_UP     = HID_KEY_ARROW_UP;
-const uint8_t HIDKEY_DOWN   = HID_KEY_ARROW_DOWN;
-const uint8_t HIDKEY_LEFT   = HID_KEY_ARROW_LEFT;
-const uint8_t HIDKEY_RIGHT  = HID_KEY_ARROW_RIGHT;
-const uint8_t HIDKEY_CENTER = HID_KEY_ENTER;
-const uint8_t HIDKEY_A      = HID_KEY_F6;
-const uint8_t HIDKEY_B      = HID_KEY_F7;
-#define N_KEY_REPORT 6
-uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE , HID_KEY_NONE};
-bool keyReportChanged = false;
+// Key codes to send for button presses:
+const uint8_t DMD_KEY_UP      = HID_KEY_ARROW_UP;
+const uint8_t DMD_KEY_DOWN    = HID_KEY_ARROW_DOWN;
+const uint8_t DMD_KEY_LEFT    = HID_KEY_ARROW_LEFT;
+const uint8_t DMD_KEY_RIGHT   = HID_KEY_ARROW_RIGHT;
+const uint8_t DMD_KEY_CENTER  = HID_KEY_ENTER;
+const uint8_t DMD_KEY_A       = HID_KEY_F5;
+const uint8_t DMD_KEY_B       = HID_KEY_F6;
+const uint8_t DMD_KEY_VIRTUAL = HID_KEY_F7;
 
-/* Device Information
-  The non-beta version of DMD2 has a whitelist of controller names that it will recognize. Until MotoButtons Lite is certified,
-  you will need to install the beta version of DMD2.
-*/
-const char BLE_DEVICE_NAME[] = "DMD2 CTL 7K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite v1";
-const char BLE_MANUFACTURER[] = "DIY";
-#define BLE_TX_POWER 8
-bool BLE_connected = false;
-
-//Mouse
+/* Mouse Mode Configuration */
 #define MOUSE_RATE_SLOW 10
 #define MOUSE_RATE_FAST 40
 #define MOUSE_RATE_DELAY 500
-#define MODE_TOGGLE_MS 1000
-bool mouse_mode = false;
-bool mouse_buttons_release = true;
 bool mouse_left_button_pressed = false;
+const uint8_t MOUSE_KEY_A     = HID_KEY_ENTER;
+
+/* MRA Mode Configuration */
+const uint8_t MRA_KEY_UP      = HID_KEY_ARROW_UP;
+const uint8_t MRA_KEY_DOWN    = HID_KEY_ARROW_DOWN;
+const uint8_t MRA_KEY_LEFT    = HID_KEY_ARROW_LEFT;
+const uint8_t MRA_KEY_RIGHT   = HID_KEY_ARROW_RIGHT;
+const uint8_t MRA_KEY_CENTER  = HID_KEY_C;
+const uint8_t MRA_KEY_A       = HID_KEY_KEYPAD_ADD;
+const uint8_t MRA_KEY_B       = HID_KEY_MINUS;
+const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N;
+/*---------------------- END MODE CONFIGURATION ----------------------*/
+
+/*----------------- BUTTON CONFIGURATION AND LOGIC -------------------*/
+/* BLE key report */
+#define N_KEY_REPORT 6
+uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE};
+bool keyReportChanged = false;
 
 // Digital IO pin mapping
 #define BUTTON_UP      2
@@ -65,40 +86,44 @@ bool mouse_left_button_pressed = false;
 #define DEBOUNCE_TIME_MS 20
 
 // state of buttons
-bool button_up_state     = false;
-bool button_down_state   = false;
-bool button_left_state   = false;
-bool button_right_state  = false;
-bool button_center_state = false;
-bool button_A_state      = false;
-bool button_B_state      = false;
+bool button_up_state      = false;
+bool button_down_state    = false;
+bool button_left_state    = false;
+bool button_right_state   = false;
+bool button_center_state  = false;
+bool button_A_state       = false;
+bool button_B_state       = false;
+bool button_virtual_state = false; // 8th virtual button activated via long press
 
 // prior state of button reading for debouncing purposes
-bool button_up_state_prior     = false;
-bool button_down_state_prior   = false;
-bool button_left_state_prior   = false;
-bool button_right_state_prior  = false;
-bool button_center_state_prior = false;
-bool button_A_state_prior      = false;
-bool button_B_state_prior      = false;
+bool button_up_state_prior      = false;
+bool button_down_state_prior    = false;
+bool button_left_state_prior    = false;
+bool button_right_state_prior   = false;
+bool button_center_state_prior  = false;
+bool button_A_state_prior       = false;
+bool button_B_state_prior       = false;
 
 // Record state change of buttons to be used to monitor when event is transmitted
-bool button_up_flipped     = false;
-bool button_down_flipped   = false;
-bool button_left_flipped   = false;
-bool button_right_flipped  = false;
-bool button_center_flipped = false;
-bool button_A_flipped      = false;
-bool button_B_flipped      = false;
+bool button_up_flipped      = false;
+bool button_down_flipped    = false;
+bool button_left_flipped    = false;
+bool button_right_flipped   = false;
+bool button_center_flipped  = false;
+bool button_A_flipped       = false;
+bool button_B_flipped       = false;
+bool button_virtual_flipped = false;
 
 // last time that button transitioned from low to high
-unsigned long button_up_time     = 0;
-unsigned long button_down_time   = 0;
-unsigned long button_left_time   = 0;
-unsigned long button_right_time  = 0;
-unsigned long button_center_time = 0;
-unsigned long button_A_time      = 0;
-unsigned long button_B_time      = 0;
+unsigned long button_up_time      = 0;
+unsigned long button_down_time    = 0;
+unsigned long button_left_time    = 0;
+unsigned long button_right_time   = 0;
+unsigned long button_center_time  = 0;
+unsigned long button_A_time       = 0;
+unsigned long button_B_time       = 0;
+unsigned long button_virtual_time = 0;
+/*------------------- END BUTTON CONFIG & LOGIC-----------------------*/
 
 //if  This function should be called rapidly in a loop to update the debounce filter and key state
 // https://docs.arduino.cc/built-in-examples/digital/Debounce
@@ -121,16 +146,7 @@ bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *bu
       stateChanged = true;
       *state = reading;
       *buttonFlipped = true;
-
-      /*
-      Serial.print(buttonName);
-      if (*state)
-        Serial.println(" button pressed.");
-      else
-        Serial.println(" button released.");
-      */
     }
-
     *priorState = reading;
 
     return stateChanged;
@@ -143,7 +159,8 @@ void releaseAllKeys() {
 
 void updateButtons() {
   bool stateChanged = false;
-
+  
+  // Read the state of all physical buttons
   stateChanged |= debounceButton(BUTTON_UP, &button_up_state, &button_up_state_prior, &button_up_flipped, &button_up_time, "UP");
   stateChanged |= debounceButton(BUTTON_DOWN, &button_down_state, &button_down_state_prior, &button_down_flipped, &button_down_time, "DOWN");
   stateChanged |= debounceButton(BUTTON_LEFT, &button_left_state, &button_left_state_prior, &button_left_flipped, &button_left_time, "LEFT");
@@ -151,75 +168,199 @@ void updateButtons() {
   stateChanged |= debounceButton(BUTTON_CENTER, &button_center_state, &button_center_state_prior, &button_center_flipped, &button_center_time, "CENTER");
   stateChanged |= debounceButton(BUTTON_A, &button_A_state, &button_A_state_prior, &button_A_flipped, &button_A_time, "A");
   stateChanged |= debounceButton(BUTTON_B, &button_B_state, &button_B_state_prior, &button_B_flipped, &button_B_time, "B");
+  
+  /* ----------- Detect state of virtual buttons ---------------------*/
+  if (button_center_state && (millis() - button_center_time > MODE_TOGGLE_MS)) {
+    // virtual button is active
+    if (!button_virtual_state) {
+      Serial.println("Virtual button activated.");
+      button_virtual_time = millis();
+      button_virtual_flipped = true;
+      stateChanged |= true;
 
+      // indicate virtual button
+      digitalWrite(LED_BUTTON_A, HIGH);
+    }
+    button_virtual_state = true;
+  }
+  else {
+    // virtual button is not active
+    if (button_virtual_state) {
+      Serial.println("Virtual button deactivated.");
+      digitalWrite(LED_BUTTON_A, LOW);
+      stateChanged |= true;
+    }
+    button_virtual_state = false;
+  }
+  /*------------------------------------------------------------------*/
+
+  // Indicate whether any buttons changed state
   keyReportChanged = stateChanged;
 
-  // Check for release of mouse mode button combination
+  /*------------------- Handle mode cycling --------------------------*/
+  // Check for release of mode cycle button combination
   if (!button_A_state || !button_B_state) {
-    //Serial.println("Mouse mode buttons released.");
-    mouse_buttons_release = true;
+    modeButtonsReleased = true;
   }
-
-  // Toggle mouse mode
-  if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS) && mouse_buttons_release) {
-    mouse_mode = !mouse_mode;
-    mouse_buttons_release = false;
+ 
+  if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS) && modeButtonsReleased) {
+    // Buttons A and B were both long-pressed, which means we should advance the mode
+    currentMode = (Mode)(((int)currentMode + 1) % N_MODES);
+    Serial.print("Mode advanced to ");
+    Serial.println(currentMode);
+    
+    // Since mode has been changed, inactivate any ongoing key or mouse presses
+    releaseAllKeys();
     blehid.mouseButtonRelease();
-    if (mouse_mode) {
-      releaseAllKeys();
-      Serial.println("Mouse mode activated.");
-      for (unsigned int i = 0; i < 10; i++) {
-        digitalToggle(LED_BUTTON_A);
-        digitalToggle(LED_BUTTON_B);
-        delay(200);
-      }
-    }
-    else {
-      Serial.println("Mouse mode deactivated.");
-      for (unsigned int i = 0; i < 4; i++) {
-        digitalToggle(LED_BUTTON_A);
-        digitalToggle(LED_BUTTON_B);
-        delay(500);
-      }
-    }
-  }
+    modeButtonsReleased = false;
 
-  if (stateChanged) {
-    // Update the HID keyboard report with all pressed keys
-    unsigned int i = 0;
-    if (button_up_state && !mouse_mode) {
-      keyReport[i] = HIDKEY_UP;
-      ++i;
+	  // Flash the LEDs indicating a change of mode occured
+    for (unsigned int i = 0; i < 30; i++) {
+      digitalToggle(LED_BUTTON_A);
+      digitalToggle(LED_BUTTON_B);
+      delay(100);
     }
-    if (button_down_state && !mouse_mode) {
-      keyReport[i] = HIDKEY_DOWN;
-      ++i;
+    digitalWrite(LED_BUTTON_A, LOW);
+    digitalWrite(LED_BUTTON_B, LOW);
+    // Also signal the new mode number
+    delay(1000);
+    for (unsigned int i = 0; i < 2*((int)currentMode+1); i++) {
+      digitalToggle(LED_BUTTON_A);
+      delay(500);
     }
-    if (button_left_state && !mouse_mode) {
-      keyReport[i] = HIDKEY_LEFT;
-      ++i;
-    }
-    if (button_right_state && !mouse_mode) {
-      keyReport[i] = HIDKEY_RIGHT;
-      ++i;
-    }
-    if (button_center_state && !mouse_mode) {
-      keyReport[i] = HIDKEY_CENTER;
-      ++i;
-    }
-    if (button_A_state) {
-      keyReport[i] = HIDKEY_A;
-      ++i;
-    }
-    if (button_B_state && (i < N_KEY_REPORT)) {
-      keyReport[i] = HIDKEY_B;
-      ++i;
+    digitalWrite(LED_BUTTON_A, LOW);
+  }
+  /*------------------------------------------------------------------*/
+}
+
+void mapButtonsToKeyReport() {
+	unsigned int i = 0;
+
+	switch (currentMode) {
+		case DMD2:
+			if (button_up_state && !button_center_state) {
+			  keyReport[i] = DMD_KEY_UP;
+			  ++i;
+			}
+			if (button_down_state && !button_center_state) {
+			  keyReport[i] = DMD_KEY_DOWN;
+			  ++i;
+			}
+			if (button_left_state && !button_center_state) {
+			  keyReport[i] = DMD_KEY_LEFT;
+			  ++i;
+			}
+			if (button_right_state && !button_center_state) {
+			  keyReport[i] = DMD_KEY_RIGHT;
+			  ++i;
+			}
+			if (button_center_state) {
+			  keyReport[i] = DMD_KEY_CENTER;
+			  ++i;
+			}
+			if (button_A_state) {
+			  keyReport[i] = DMD_KEY_A;
+			  ++i;
+			}
+			if (button_B_state && (i < N_KEY_REPORT)) {
+			  keyReport[i] = DMD_KEY_B;
+			  ++i;
+			}
+			if (button_virtual_state && (i < N_KEY_REPORT)) {
+			  keyReport[i] = DMD_KEY_VIRTUAL;
+			  ++i;
+			}
+			break;
+		case mouse:
+			if (button_A_state && button_A_flipped) {
+			  keyReport[0] = MOUSE_KEY_A;
+			  ++i;
+			  button_A_flipped = false;
+			}
+			break;
+		case MRA:
+			if (button_up_state && !button_center_state) {
+			  keyReport[i] = MRA_KEY_UP;
+			  ++i;
+			}
+			if (button_down_state && !button_center_state) {
+			  keyReport[i] = MRA_KEY_DOWN;
+			  ++i;
+			}
+			if (button_left_state && !button_center_state) {
+			  keyReport[i] = MRA_KEY_LEFT;
+			  ++i;
+			}
+			if (button_right_state && !button_center_state) {
+			  keyReport[i] = MRA_KEY_RIGHT;
+			  ++i;
+			}
+			if (button_center_state) {
+			  keyReport[i] = MRA_KEY_CENTER;
+			  ++i;
+			}
+			if (button_A_state) {
+			  keyReport[i] = MRA_KEY_A;
+			  ++i;
+			}
+			if (button_B_state && (i < N_KEY_REPORT)) {
+			  keyReport[i] = MRA_KEY_B;
+			  ++i;
+			}
+			if (button_virtual_state && (i < N_KEY_REPORT)) {
+			  keyReport[i] = MRA_KEY_VIRTUAL;
+			  ++i;
+			}
+			break;
+		default:
+			break;
+	}
+	
+	for (unsigned int j = i; j < N_KEY_REPORT; j++) {
+		keyReport[j] = HID_KEY_NONE;
+	}
+}
+
+void handleMouse() {
+    // handle mouse click release
+    if ((!button_center_state && button_center_flipped) || (!button_B_state && button_B_flipped) && mouse_left_button_pressed) {
+      Serial.println("Mouse left release.");
+      blehid.mouseButtonRelease();
+      button_center_flipped = false;
+      button_B_flipped = false;
+      mouse_left_button_pressed = false;
     }
 
-    for (unsigned int j = i; j < N_KEY_REPORT; j++) {
-      keyReport[j] = HID_KEY_NONE;
-    }
-  }
+      // Handle click
+      if ((button_center_state && button_center_flipped) || (button_B_state && button_B_flipped) && !mouse_left_button_pressed) {
+        Serial.println("Mouse left click.");
+        blehid.mouseButtonPress(MOUSE_BUTTON_LEFT);
+        button_center_flipped = false;
+        button_B_flipped = false;
+        mouse_left_button_pressed = true;
+      }
+
+      // Move pointer
+      if (!button_center_state) {
+        int rate = MOUSE_RATE_SLOW;
+        unsigned long currTimeMs = millis();
+        if (((currTimeMs - button_up_time > MOUSE_RATE_DELAY) && button_up_state) ||
+            ((currTimeMs - button_down_time > MOUSE_RATE_DELAY) && button_down_state) ||
+            ((currTimeMs - button_left_time > MOUSE_RATE_DELAY) && button_left_state) ||
+            ((currTimeMs - button_right_time > MOUSE_RATE_DELAY) && button_right_state))
+          rate = MOUSE_RATE_FAST;
+        else
+          rate = MOUSE_RATE_SLOW;
+
+        if (button_up_state)
+          blehid.mouseMove(0, -rate);
+        if (button_down_state)
+          blehid.mouseMove(0, rate);
+        if (button_left_state)
+          blehid.mouseMove(-rate, 0);
+        if (button_right_state)
+          blehid.mouseMove(rate, 0);
+      }
 }
 
 void setupDigitalIO() {
@@ -240,6 +381,8 @@ void setupDigitalIO() {
 
 void setup() 
 {
+  currentMode = DMD2;
+  
   setupDigitalIO();
 
   Serial.begin(115200);
@@ -300,11 +443,6 @@ void startAdv(void)
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
 }
 
-bool button_is_pressed() {
-  return button_up_state || button_down_state || button_left_state || button_right_state || button_center_state || button_A_state || button_B_state;
-}
-
-// This loop only runs once BLE is connected to a host
 void loop() 
 {
   // Indicate whether the device is connected and running
@@ -317,55 +455,22 @@ void loop()
   else if (Bluefruit.connected() == 0) {
     digitalToggle(LED_BUTTON_A);
     digitalToggle(LED_BUTTON_B);
-    delay(125);
+    delay(200);
     BLE_connected = false;
   }
 
+  // Read current state of buttons
   updateButtons();
-
-  // Event handler for BLE related actions
-  if (mouse_mode && BLE_connected) {
-    // handle mouse click release
-    if ((!button_center_state && button_center_flipped) || (!button_B_state && button_B_flipped) && mouse_left_button_pressed) {
-      Serial.println("Mouse left release.");
-      blehid.mouseButtonRelease();
-      button_center_flipped = false;
-      button_B_flipped = false;
-      mouse_left_button_pressed = false;
-    }
-
-    if (button_is_pressed()) {
-      // Handle click
-      if ((button_center_state && button_center_flipped) || (button_B_state && button_B_flipped) && !mouse_left_button_pressed) {
-        Serial.println("Mouse left click.");
-        blehid.mouseButtonPress(MOUSE_BUTTON_LEFT);
-        button_center_flipped = false;
-        button_B_flipped = false;
-        mouse_left_button_pressed = true;
-      }
-
-      // Move pointer
-      int rate = MOUSE_RATE_SLOW;
-      unsigned long currTimeMs = millis();
-      if (((currTimeMs - button_up_time > MOUSE_RATE_DELAY) && button_up_state) ||
-          ((currTimeMs - button_down_time > MOUSE_RATE_DELAY) && button_down_state) ||
-          ((currTimeMs - button_left_time > MOUSE_RATE_DELAY) && button_left_state) ||
-          ((currTimeMs - button_right_time > MOUSE_RATE_DELAY) && button_right_state))
-        rate = MOUSE_RATE_FAST;
-      else
-        rate = MOUSE_RATE_SLOW;
-
-      if (button_up_state)
-        blehid.mouseMove(0, -rate);
-      if (button_down_state)
-        blehid.mouseMove(0, rate);
-      if (button_left_state)
-        blehid.mouseMove(-rate, 0);
-      if (button_right_state)
-        blehid.mouseMove(rate, 0);
-    }
-  }
-  else if (keyReportChanged && BLE_connected) {
-    blehid.keyboardReport(0, keyReport);
+  
+  if (BLE_connected) {
+	  // Compile the BLE HID key report
+	  if (keyReportChanged) {
+		Serial.println("Sent key report.");
+		mapButtonsToKeyReport();
+		blehid.keyboardReport(0, keyReport);
+	  }
+	  
+	  if (currentMode == mouse)
+		handleMouse();
   }
 }

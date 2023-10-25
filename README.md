@@ -1,16 +1,16 @@
 # MotoButtons Lite
-A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) motorcycle navigation with joystick and mouse mode for only $28 in parts.
+A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) and [MyRoute App](https://www.myrouteapp.com/) motorcycle navigation with joystick and mouse mode for only $28 in parts.
 
-**At this time, you must [install the DMD2 beta version](https://youtu.be/bJglvH23oGI?feature=shared&t=128) from the Google Play Store by joining at the bottom of the DMD2 app page in the Play Store**
+**At this time, in order to use with Drivemode Dashboard, you must [install the DMD2 beta version](https://youtu.be/bJglvH23oGI?feature=shared&t=128) from the Google Play Store. To do this, join the beta program at the bottom of the DMD2 app page in the Play Store**
 
 <img src="ConstructionGuide/Photos/MotoButtonsLiteMounted.jpg" alt="motobuttons lite installed on handlebar" width="800"/>
 
-*The full version of MotoButtons will feature a IP68 rated 4-way castle switch and will be easier to construct (no sealing or fine hole drilling required), but the part will cost about $70 additional. Stay tuned*
+*A more expensive version of MotoButtons will feature a IP68 rated 4-way castle switch and will be easier to construct (no sealing or fine hole drilling required), but the part will cost about $75 additional. Stay tuned*
 
 ## Why a DIY controller?
 As of October of 2023, [all available controllers](https://www.drivemodedashboard.com/certified-remote-controllers/) for Drivemode Dashboard are rather expensive, especially if shipped outside of Europe, or do not offer the ideal functionality in a small size. The [least expensive controller](https://www.thorkracing.com/produto/arn-remote-pro/) that is in stock and can be shipped to the USA costs $215 USD with shipping. Since many riders have two, three or even four motorcycles, the total cost could be as high as $683, just for a set of basic controllers! However, even this controller only offers a two-way switch, so functionality is limited. 
 
-On the other hand, an ideal controller would offer a low price, small size, light weight and a navigation switch (joystick). The joystick could be used either as a "mouse" (up/down/left/right/click) or to manipulate Drivemode Dashboard functions. 
+On the other hand, an ideal controller would offer a low price, small size, light weight and a navigation switch (joystick). The joystick could be used either as a "mouse" (up/down/left/right/click) or to manipulate app functions, including Drivemode Dashboard and MyRoute App. 
 
 MotoButtons Lite is for the DIY enthusiast who wants to construct a low cost controller. The trade off is that the Lite version requires careful drilling and gluing to construct the enclosure and waterproof the joystick.
 

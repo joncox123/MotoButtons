@@ -6,13 +6,13 @@ To pair with your phone, power up MotoButtons and ask your phone to pair with th
 
 ## Cycling Through Modes
 MotoButtons supports multiple modes of operation, including:
-1. Mouser cursor mode
+1. Mouse cursor mode
 2. Drivemode Dashboard 2 mode
 3. MyRoute App mode
 
-MotoButtons can be cycled through these modes, in that order (Mouse->DMD2->MRA) by holding down both A and B buttons for 1 second. When advancing the mode, both LEDs will flash rapidly for 2 seconds. Then LED A will flash to indicate the mode number (one flash for DMD2, two flashes for mouse, three flashes for MyRoute App). 
+MotoButtons can be cycled through these modes, in that order (Mouse->DMD2->MRA) by holding down both A and B buttons for 1 second. When advancing the mode, both LEDs will flash rapidly for 2 seconds. Then LED A will flash to indicate the mode number (one flash for mouse, two flashes for DMD2, three flashes for MyRoute App). 
 
-The mode state will be saved so that the last mode prior to power down will be activated at the next power up. In other words, if you keep your MotoButtons set to MyRoute App mode, it will remember that when you use it next. Upon boot, the mode will be indicated by flashing to indicate the mode number.
+The mode state will be saved so that the last mode prior to power down will be activated at the next power up. In other words, if you keep your MotoButtons set to MyRoute App mode, it will remember that when you use it next. Upon boot, the mode will be indicated by flashing the mode number.
 
 ## Button Mapping
 This section describes the button mapping for each mode.

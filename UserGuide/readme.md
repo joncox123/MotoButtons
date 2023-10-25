@@ -24,4 +24,6 @@ Mouse mode is simple. The joystick moves the mouse cursor. Pressing the center o
 The joystick controls up/down/left/right, accordingly. A button activated F5, B button F6 and long pressing the joystick center activates F7.
 
 ### MyRoute App Mode
+First, you must set MyRoute App to use the "BarButtons" controller. This provides the necessary functionality and MyRoute App will interpret the button presses correctly.
+
 When in MyRoute App mode, the joystick will pan the map view. Buttons A and B will zoom the map view in and out. Tapping the joystick center button will center the map. Long pressing the joystick center will activate the menu.

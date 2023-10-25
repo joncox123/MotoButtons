@@ -55,7 +55,7 @@ The easiest option to power the device, which does not require machining a slot 
 Since the microcontroller requires 5 Volt power, the easiest way to power it is via an old USB cable, assuming you also have a USB port on your bike. Thus, you could take an old cable, cut the end off, and solder the ground and power wire to the GND and 5V pads on the microcontroller, as described near the end of this guide.
 
 ### Machine the USB-C Connector Slot (Option 2, Not Recommended at this Time)
-If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durability and waterproofing, you may wish to cut a slot for the USB-C connector on the microcontroller. This will allow you to update the firmware in the future, should additional functionality become available (or if you wish to modify the source code yourself). **However, I do not recommend potting with epoxy yet because of a bug in the microcontroller firmware that requires hitting the reset button to upload new firmware.**
+If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durability and waterproofing, you may wish to cut a slot for the USB-C connector on the microcontroller. This will allow you to update the firmware in the future, should additional functionality become available (or if you wish to modify the source code yourself). **However, I do not recommend potting with epoxy just yet because of a bug in the microcontroller firmware that requires hitting the reset button twice to upload new firmware. Update: a solution to this issue has been implemented, which requires holding down buttons A and B for 10 seconds to trigger a software reset into DFU mode. However, please wait until further testing is completed before potting with epoxy.**
 
 The slot for a female USB-C connector is approximately 1/8" (3.18 mm) tall and 9 mm wide (end to end). Therefore, using the center punch, mark two horizontally spaced holes that are 5.83 mm apart by printing out the template and using a center punch or using a caliper. Drill both holes with a 1/8" drill bit. Using a needle file set, carefully file out the slot. You will need to test fit the slot with the microcontroller, as shown below. This will require some trial and error, as it is necessary to file the ends using the round file and the straight edges with a flat file until the connector fits snuggly. I used a milling machine with a 1/8" endmill to do this, although I still had to do manual filing to get the connector to fit.
 
@@ -160,17 +160,20 @@ Finally, click the upload button!
 
 <img src="Photos/upload.png" alt="install Seeed BSP" width="600"/>
 
-Note, the microcontroller's firmware appears to have a bug whereby it is not always possible to upload new software. If this occurs, you will get a message in the Arduino IDE output saying "unable to upload in DFU mode", or something similar. If this happens, you need to depress the tiny reset button on the microcontroller (using a small tool or pencil). Hold it down, then release and very quickly and double click it rapidly. This will cause the internal memory to be mounted as a disk drive on your computer. Next, close the Arduino IDE and relaunch it. You should be able to upload again. I am currently researching whether it is possible to solve this issue, or bypass it with another upload process.
-
 ## Sealing the Case
-At this point, you are ready to close the case. However, you have a couple of options to consider before proceeding. Since MotoButtons is currently under active development, you may not want to epoxy fill the case just yet. The reason is, the Seeed XIAO microcontroller has a bug that sometimes occurs and makes it impossible to re-upload the software without double tapping the reset button on the microcontroller. Until this is resolved, I recommend not permanetly gluing the microcontroller in the case. 
+At this point, you are ready to close the case. However, you have a couple of options to consider before proceeding. Since MotoButtons is currently under active development, you may not want to epoxy fill the case just yet.
 
 Therefore, if you milled a slot for the USB-C connector, I recommend using some hot glue to temporarily seal and fix the microcontroller in the case. If you opted to simply drill a small hole for two power wires (connected to GND and 5V), then you can apply sealant to the power wire holes to make it waterproof, then screw the lid on. 
-
-To update the firmware in the future, you will need to plug a USB-C cable into the microcontroller. At the present time, I am researching options for OTA updates and/or fixing the bug that prevents reliable firmware upload without hitting the tiny reset button on the top side of the microcontroller.
 
 ## Mounting to the Motorcycle
 Now that you've completed your build, and hopefully tested it successfully with the DMD2 beta app, you are ready to mount it on the motorcycle. This is the perfect time to be creative and figure out new and better ways to mount the unit. One simple option is to use waterproof, double sided mounting tape to adhere it to the switchgear on the right hand side, for example. You could also adhere it to any other relatively flat surface, including one attached to a RAM ball mount. If you are ambitious, you could attach it to a standard handlebar clamp mount with a screw and bolt or inserting a stud into the case and filling with epoxy. The options are endless.
 
 <img src="Photos/MotoButtonsLiteMounted.jpg" alt="motobuttons lite installed on handlebar" width="800"/>
+
+## Updating the Software for Future Releases
+To update the software again, you need to open the case and connect the USB-C port to your computer. Launch the Arduino IDE and open the new source code file. However, there is a bug in the microcontroller's DFU (Device Firmware Update) bootloader that sometimes prevents new software from being uploaded unless a special reset procedure is followed. 
+
+If you try to upload new software and you either get an error stating the DFU upload failed, or it simply times out after about 60 seconds, you probably need to perform the special reset. There are two options to perform this reset. The first option is to hold down buttons A and B for 10 seconds, as if you were changing the mode. This should reset the controller into DFU mode again. The second option is to rapidly double tap the tiny reset button that is next to the USB-C connector. However, this is hard to do because it is so small, and it requires opening the case, which could be impossible if it is filled with epoxy and you can't get to the button. 
+
+After resetting into DFU mode, keep in mind that the COM port (serial port) number of the microcontroller will have changed. So you will need to select it again in the drop down menu in the toolbar at the top of the Arduino IDE. Then you can proceed to upload the new code.
 

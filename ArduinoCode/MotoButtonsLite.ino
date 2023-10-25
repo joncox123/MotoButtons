@@ -4,7 +4,18 @@ License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
 Version: 1.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
+#include <Adafruit_LittleFS.h>
+#include <InternalFileSystem.h>
+#include <stdlib.h>
 
+using namespace Adafruit_LittleFS_Namespace;
+
+/*----- Persistent Storage Filesystem -----*/
+// This is used to store settings, such as the last mode
+#define FILENAME    "/MotoButtons.set"
+File file(InternalFS);
+
+// BLE classes
 BLEDis bledis;
 BLEHidAdafruit blehid;
 
@@ -25,8 +36,8 @@ bool BLE_connected = false;
 #define MODE_TOGGLE_MS 1000
 #define N_MODES 3
 enum Mode {
-	DMD2 = 0,
-	mouse = 1,
+	mouse = 0,
+  DMD2 = 1,
 	MRA = 2
 };
 enum Mode currentMode;
@@ -157,6 +168,15 @@ void releaseAllKeys() {
   blehid.keyboardReport(0, keyReportRelease);
 }
 
+void indicateMode() {
+    // signal the new mode number
+    for (unsigned int i = 0; i < 2*((int)currentMode+1); i++) {
+      digitalToggle(LED_BUTTON_A);
+      delay(500);
+    }
+    digitalWrite(LED_BUTTON_A, LOW);
+}
+
 void updateButtons() {
   bool stateChanged = false;
   
@@ -214,6 +234,9 @@ void updateButtons() {
     blehid.mouseButtonRelease();
     modeButtonsReleased = false;
 
+    // store new mode to flash memory
+    writeSettings();
+
 	  // Flash the LEDs indicating a change of mode occured
     for (unsigned int i = 0; i < 30; i++) {
       digitalToggle(LED_BUTTON_A);
@@ -222,13 +245,8 @@ void updateButtons() {
     }
     digitalWrite(LED_BUTTON_A, LOW);
     digitalWrite(LED_BUTTON_B, LOW);
-    // Also signal the new mode number
     delay(1000);
-    for (unsigned int i = 0; i < 2*((int)currentMode+1); i++) {
-      digitalToggle(LED_BUTTON_A);
-      delay(500);
-    }
-    digitalWrite(LED_BUTTON_A, LOW);
+    indicateMode();
   }
   /*------------------------------------------------------------------*/
 }
@@ -379,16 +397,74 @@ void setupDigitalIO() {
   digitalWrite(LED_BUTTON_B, LOW);
 }
 
+bool writeSettings() {
+    char modeStr[8];
+
+    // Settings file does not exist, we need to create it
+    Serial.print("Creating " FILENAME " to store settings...");
+
+    if (file.open(FILENAME, FILE_O_WRITE)) {
+      Serial.println("File opened successfully.");
+      // file is opened in append mode by default
+      file.truncate(0);
+      file.seek(0);
+
+      itoa((int)currentMode, modeStr, 10);
+      file.write(modeStr, strlen(modeStr));
+      file.close();
+
+      return true;
+    }
+    else {
+      Serial.println("Error writing settings file!");
+
+      return false;
+    }
+}
+
+bool readSettings() {
+  file.open(FILENAME, FILE_O_READ);
+  // Does settings file already exist?
+  if (file) {
+    // File already exists
+    Serial.println(FILENAME " settings file exists, reading...");
+    
+    uint32_t readlen;
+    char buffer[8] = { 0 };
+    readlen = file.read(buffer, sizeof(buffer));
+
+    buffer[readlen] = 0;
+    Serial.print("Mode: ");
+    Serial.println(buffer);
+    file.close();
+
+    // Store the current mode
+    int n = atoi(buffer);
+    if (n < 0 || (n > N_MODES-1)) {
+      Serial.println("Invalid mode value, setting to zero.");
+      n = 0;
+    }
+    currentMode = (Mode)n;
+
+    return true;
+  }
+  else {
+    Serial.println(FILENAME " settings file not found.");
+    
+    return false;
+  }
+}
+
 void setup() 
 {
-  currentMode = DMD2;
+  currentMode = mouse;
   
   setupDigitalIO();
 
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
-  Serial.println("Drivemode Dashboard BLE Controller");
+  Serial.println("MotoButtons BLE Controller");
   Serial.println("-----------------------------\n");
   Serial.println();
 
@@ -412,6 +488,20 @@ void setup()
   Serial.println("Setup complete.");
   digitalWrite(LED_BUTTON_A, HIGH);
   digitalWrite(LED_BUTTON_B, HIGH);
+
+  // Initialize Internal File System
+  InternalFS.begin();
+
+  // Restore settings
+  bool success = false;
+  success = readSettings();
+  if (!success)
+    writeSettings();
+
+  digitalWrite(LED_BUTTON_A, LOW);
+  digitalWrite(LED_BUTTON_B, LOW);
+  indicateMode();
+  delay(1000);
 }
 
 void startAdv(void)
@@ -471,6 +561,6 @@ void loop()
 	  }
 	  
 	  if (currentMode == mouse)
-		handleMouse();
+		  handleMouse();
   }
 }

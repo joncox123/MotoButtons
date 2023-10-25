@@ -1,5 +1,5 @@
 # MotoButtons Lite
-A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) and [MyRoute App](https://www.myrouteapp.com/) motorcycle navigation with joystick and mouse mode for only $28 in parts.
+A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) and [MyRoute App](https://www.myrouteapp.com/) motorcycle navigation with joystick and mouse mode. The cost is only $28 in parts.
 
 **At this time, in order to use with Drivemode Dashboard, you must [install the DMD2 beta version](https://youtu.be/bJglvH23oGI?feature=shared&t=128) from the Google Play Store. To do this, join the beta program at the bottom of the DMD2 app page in the Play Store**
 

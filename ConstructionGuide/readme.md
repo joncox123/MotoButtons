@@ -10,7 +10,7 @@ First, you'll need to acquire the necessary components, tools and supplies, as m
 
 ## Let's Get Started
 ### Machine the Enclosure
-First, you need to make the necessary modifications to the Hammond IP68 rated enclosure. While I used a milling machine to do this, it's readily possible with the proper hand tools, technique and attention to detail. At the end of the day, since you will most likely be filling the case with epoxy (potting), is not necessary for everything to be perfect. The sealant, joystick boot and buttons will cover up any minor issues.
+First, you need to make the necessary modifications to the Hammond IP68 rated enclosure. While I used a milling machine to do this, it's readily possible with the proper hand tools, technique and attention to detail. At the end of the day, it is not necessary for everything to be perfect. The sealant, joystick boot and buttons will cover up any minor issues.
 Take a look at the [3D model (3D PDF)](../Enclosure/MotoButtons%20Lite%20Enclosure%201551WH%20Bottom%203D.pdf) to get an idea of what you will be doing.
 
 <img src="../Enclosure/enclosure.png" alt="3D model of modified case" width="600"/>
@@ -40,7 +40,7 @@ Before proceeding, test fit the buttons and the navigation switch. **Caution: th
 <img src="Photos/Test_Fit_Navigation_Switch.jpg" alt="Microcontroller in USB-C slot" width="600"/>
 
 ### Cut Off the Circuit Board Posts (Optional)
-If you ordered the buttons with screw thread mounting, as opposed to the snap on ones, you'll need to cut off two of the PCB mounting posts on the inside of the case. Otherwise, you won't be able to properly tighten the nut to secure the top button. Its possible to omit this step by ordering the snap in buttons, but the waterproofing won't be as good unless you are also potting the case with epoxy. 
+If you ordered the buttons with screw thread mounting, as opposed to the snap on ones, you'll need to cut off two of the PCB mounting posts on the inside of the case. Otherwise, you won't be able to properly tighten the nut to secure the top button. It's possible to omit this step by ordering the snap in buttons, but the waterproofing won't be as good unless you are also potting the case with epoxy. 
 
 **Nevertheless, if you are going to pot with epoxy, you could simply tighten the nut the best you can without cutting off the posts, and skip this step.**
 
@@ -49,13 +49,13 @@ Use a dremel with a small cut off wheel to cut off the upper posts. Then sand th
 ## Power Entry
 This section describes two options for power the device. By the way, this microcontroller has integrated functionality for charging a lithium battery. While this guide does not describe such a version, it could be easily built by soldering a small battery to the proper terminals.
 
-### Drill Hole for Power Wires (Option 1)
+### Drill Hole for Power Wires (Option 1, Recommended)
 The easiest option to power the device, which does not require machining a slot for the USB-C connector, is to drill a hole on the end for the power wires. This option is also the easiest to seal, as after you run the wires through the end of the case, you only need to apply a bit of sealant on the inside and outside of the wires. 
 
 Since the microcontroller requires 5 Volt power, the easiest way to power it is via an old USB cable, assuming you also have a USB port on your bike. Thus, you could take an old cable, cut the end off, and solder the ground and power wire to the GND and 5V pads on the microcontroller, as described near the end of this guide.
 
-### Machine the USB-C Connector Slot (Option 2)
-If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durability and waterproofing, you may wish to cut a slot for the USB-C connector on the microcontroller. This will allow you to update the firmware in the future, should additional functionality become available (or if you wish to modify the source code yourself). 
+### Machine the USB-C Connector Slot (Option 2, Not Recommended at this Time)
+If you are planning to epoxy fill (pot) the enclosure, for the ultimate in durability and waterproofing, you may wish to cut a slot for the USB-C connector on the microcontroller. This will allow you to update the firmware in the future, should additional functionality become available (or if you wish to modify the source code yourself). **However, I do not recommend potting with epoxy yet because of a bug in the microcontroller firmware that requires hitting the reset button to upload new firmware.**
 
 The slot for a female USB-C connector is approximately 1/8" (3.18 mm) tall and 9 mm wide (end to end). Therefore, using the center punch, mark two horizontally spaced holes that are 5.83 mm apart by printing out the template and using a center punch or using a caliper. Drill both holes with a 1/8" drill bit. Using a needle file set, carefully file out the slot. You will need to test fit the slot with the microcontroller, as shown below. This will require some trial and error, as it is necessary to file the ends using the round file and the straight edges with a flat file until the connector fits snuggly. I used a milling machine with a 1/8" endmill to do this, although I still had to do manual filing to get the connector to fit.
 

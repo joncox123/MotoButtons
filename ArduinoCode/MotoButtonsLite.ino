@@ -6,9 +6,13 @@ Version: 1.1 with support for the following modes: DMD2, mouse cursor, MyRoute A
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
+#include <Adafruit_TinyUSB.h>
 #include <stdlib.h>
 
 using namespace Adafruit_LittleFS_Namespace;
+
+// How long to wait until DFU reset mode is activated
+#define MODE_RESET_MS 10000
 
 /*----- Persistent Storage Filesystem -----*/
 // This is used to store settings, such as the last mode
@@ -217,12 +221,21 @@ void updateButtons() {
   // Indicate whether any buttons changed state
   keyReportChanged = stateChanged;
 
+  /* Hard reset and enter firmware udpate mode (DFU)
+   * This mode is necessary because the bootloader in the Seed nRF52840 has a bug that prevents uploading new software
+   * from the Arduino IDE if a BLE sketch is uploaded previously. Thus, it is necessary to enter via triggering a DFU reset event.
+   */
+  if (button_A_state && button_B_state && (millis() - button_A_time > MODE_RESET_MS) && (millis() - button_B_time > MODE_RESET_MS)) {
+    Serial.println("Resetting and entering firmware update (FDU) mode...");
+    enterSerialDfu();
+  }
+
   /*------------------- Handle mode cycling --------------------------*/
   // Check for release of mode cycle button combination
   if (!button_A_state || !button_B_state) {
     modeButtonsReleased = true;
   }
- 
+
   if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS) && modeButtonsReleased) {
     // Buttons A and B were both long-pressed, which means we should advance the mode
     currentMode = (Mode)(((int)currentMode + 1) % N_MODES);
@@ -342,7 +355,6 @@ void mapButtonsToKeyReport() {
 void handleMouse() {
     // handle mouse click release
     if ((!button_center_state && button_center_flipped) || (!button_B_state && button_B_flipped) && mouse_left_button_pressed) {
-      Serial.println("Mouse left release.");
       blehid.mouseButtonRelease();
       button_center_flipped = false;
       button_B_flipped = false;
@@ -351,7 +363,6 @@ void handleMouse() {
 
       // Handle click
       if ((button_center_state && button_center_flipped) || (button_B_state && button_B_flipped) && !mouse_left_button_pressed) {
-        Serial.println("Mouse left click.");
         blehid.mouseButtonPress(MOUSE_BUTTON_LEFT);
         button_center_flipped = false;
         button_B_flipped = false;
@@ -555,7 +566,6 @@ void loop()
   if (BLE_connected) {
 	  // Compile the BLE HID key report
 	  if (keyReportChanged) {
-		Serial.println("Sent key report.");
 		mapButtonsToKeyReport();
 		blehid.keyboardReport(0, keyReport);
 	  }

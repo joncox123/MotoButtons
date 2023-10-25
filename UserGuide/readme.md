@@ -27,3 +27,8 @@ The joystick controls up/down/left/right, accordingly. A button activated F5, B 
 First, you must set MyRoute App to use the "BarButtons" controller. This provides the necessary functionality and MyRoute App will interpret the button presses correctly.
 
 When in MyRoute App mode, the joystick will pan the map view. Buttons A and B will zoom the map view in and out. Tapping the joystick center button will center the map. Long pressing the joystick center will activate the menu.
+
+## Updating the Software
+To update the software on the microcontroller with a new release of MotoButtons, you may need to reset the controller to put it into Device Firmware Update (DFU) mode. This can be done by holding down buttons A and B for 10 seconds. This is the same procedure for changing the mode, except you must hold them down together for 10 seconds instead of only for one second.
+
+There is a bug in the microcontroller's bootloader firmware that can sometimes prevent new MotoButtons software releases from being uploaded via the Arduino IDE, unless a special reset is performed. If this happens, the IDE will fail to upload new "sketches" (software code) by either timing out or printing a DFU (Device Firmware Update) error message. This could be especially problematic if you filled the case with epoxy (potting) or cannot access the tiny reset button on the microcontroller. Otherwise, it is necessary to quickly double tap the tiny reset button in order to manually enter DFU (software update) mode again.

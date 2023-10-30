@@ -28,6 +28,11 @@ First, you must set MyRoute App to use the "BarButtons" controller. This provide
 
 When in MyRoute App mode, the joystick will pan the map view. Buttons A and B will zoom the map view in and out. Tapping the joystick center button will center the map. Long pressing the joystick center will activate the menu.
 
+## Rotating the Orientation
+Since MotoButtons may be installed on the motorcycle in any orientation, it is sometimes necessary to rotate the orientation of the joystick. This can be done by holding down the joystick in the direction you want to be the new "up" direction, while powering on. In other words, let's say you want to mount the device upside down. Then you would press "down" on the joystick (it will now be upward when mounted upside down), then while holding this direction, apply power to the device. The change should be stored within a couple of seconds. 
+
+At subsequent power cycles, the settings, including orientation, will be remembered and loaded.
+
 ## Updating the Software
 To update the software on the microcontroller with a new release of MotoButtons, you may need to reset the controller to put it into Device Firmware Update (DFU) mode. This can be done by holding down buttons A and B for 10 seconds. This is the same procedure for changing the mode, except you must hold them down together for 10 seconds instead of only for one second.
 

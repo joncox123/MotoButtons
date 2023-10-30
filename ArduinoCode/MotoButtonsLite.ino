@@ -1,7 +1,6 @@
 /*********************************************************************
-author: joncox@alum.mit.edu
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
-Version: 1.1.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
+Version: 1.2.0 with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -17,6 +16,9 @@ using namespace Adafruit_LittleFS_Namespace;
 // How long to wait until DFU reset mode is activated
 #define MODE_RESET_MS 15000
 
+#define DEFAULT_BUTTON_MAP 2
+uint8_t buttonOrientation = DEFAULT_BUTTON_MAP;
+
 /*----- Persistent Storage Filesystem -----*/
 // This is used to store settings, such as the last mode
 #define FILENAME    "/MotoButtons.set"
@@ -29,7 +31,7 @@ BLEHidAdafruit blehid;
 // BLE configuration
 #define BLE_TX_POWER 8
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.1.1";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.0";
 const char BLE_MANUFACTURER[] = "Me";
 bool BLE_connected = false;
 
@@ -44,8 +46,8 @@ bool BLE_connected = false;
 #define N_MODES 3
 enum Mode {
 	mouse = 0,
-  DMD2 = 1,
-	MRA = 2
+    DMD2  = 1,
+	MRA   = 2
 };
 enum Mode currentMode;
 
@@ -90,16 +92,16 @@ const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N;
 uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE};
 bool keyReportChanged = false;
 
-// Digital IO pin mapping
-#define BUTTON_UP      2
-#define BUTTON_DOWN    4
-#define BUTTON_LEFT    3
-#define BUTTON_RIGHT   0
-#define BUTTON_CENTER  1
-#define BUTTON_A       6
-#define BUTTON_B       5
-#define LED_BUTTON_A   8
-#define LED_BUTTON_B   7
+// Digital IO pin mapping (default)
+uint8_t BUTTON_UP      = 4;
+uint8_t BUTTON_DOWN    = 2;
+uint8_t BUTTON_LEFT    = 0;
+uint8_t BUTTON_RIGHT   = 3;
+uint8_t BUTTON_CENTER  = 1;
+uint8_t BUTTON_A       = 5;
+uint8_t BUTTON_B       = 6;
+uint8_t LED_BUTTON_A   = 7;
+uint8_t LED_BUTTON_B   = 8;
 
 #define DEBOUNCE_TIME_MS 20
 
@@ -143,6 +145,94 @@ unsigned long button_B_time       = 0;
 unsigned long button_virtual_time = 0;
 /*------------------- END BUTTON CONFIG & LOGIC-----------------------*/
 
+// At startup, the user can hold down a joystick direction to select an orientation
+// -1 indicates no valid selection was made
+int getButtonMapSelection() {
+	// Read all four directions because we can only allow a mode switch if
+	// one direction is pressed
+	uint8_t up = digitalRead(BUTTON_UP);
+	uint8_t down = digitalRead(BUTTON_DOWN);
+	uint8_t left = digitalRead(BUTTON_LEFT);
+	uint8_t right = digitalRead(BUTTON_RIGHT);
+	
+	if (up + down + left + right > 1) {
+		// user held down more than one direction, return the default mapping
+		return -1;
+	}
+	
+	if (up)
+		return 2;
+	if (down)
+		return 0;
+	if (left)
+		return 1;
+	if (right)
+		return 3;
+	
+	// no selection was made
+	return -1;	
+}
+
+/* Change the mapping of buttons based on a map specifier, buttMap
+ * butMapp:
+ * 	0: UP is GPIO pin 2
+ *  1: UP is GPIO pin 3
+ *  2: UP is GPIO pin 4
+ *  3: UP is GPIO pin 0
+ */
+bool setButtonMapping(uint8_t buttMap) {
+	switch (buttMap) {
+	case 0: // two button on top
+		BUTTON_UP      = 2;
+		BUTTON_DOWN    = 4;
+		BUTTON_LEFT    = 3;
+		BUTTON_RIGHT   = 0;
+		BUTTON_CENTER  = 1;
+		BUTTON_A       = 6;
+		BUTTON_B       = 5;
+		LED_BUTTON_A   = 8;
+		LED_BUTTON_B   = 7;
+		break;
+	case 1: // two button on left
+		BUTTON_UP      = 0;
+		BUTTON_DOWN    = 3;
+		BUTTON_LEFT    = 2;
+		BUTTON_RIGHT   = 4;
+		BUTTON_CENTER  = 1;
+		BUTTON_A       = 6;
+		BUTTON_B       = 5;
+		LED_BUTTON_A   = 8;
+		LED_BUTTON_B   = 7;
+		break;
+	case 2: // two button on bottom
+		BUTTON_UP      = 4;
+		BUTTON_DOWN    = 2;
+		BUTTON_LEFT    = 0;
+		BUTTON_RIGHT   = 3;
+		BUTTON_CENTER  = 1;
+		BUTTON_A       = 5;
+		BUTTON_B       = 6;
+		LED_BUTTON_A   = 7;
+		LED_BUTTON_B   = 8;
+		break;
+	case 3: // two buttons toward right
+		BUTTON_UP      = 3;
+		BUTTON_DOWN    = 0;
+		BUTTON_LEFT    = 4;
+		BUTTON_RIGHT   = 2;
+		BUTTON_CENTER  = 1;
+		BUTTON_A       = 6;
+		BUTTON_B       = 5;
+		LED_BUTTON_A   = 8;
+		LED_BUTTON_B   = 7;
+		break;
+	default:
+		return true;
+	}
+
+	return false;
+}
+
 //if  This function should be called rapidly in a loop to update the debounce filter and key state
 // https://docs.arduino.cc/built-in-examples/digital/Debounce
 bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *buttonFlipped,
@@ -175,13 +265,17 @@ void releaseAllKeys() {
   blehid.keyboardReport(0, keyReportRelease);
 }
 
-void indicateMode() {
+void indicateMode(uint8_t mode, bool led) {
     // signal the new mode number
-    for (unsigned int i = 0; i < 2*((int)currentMode+1); i++) {
-      digitalToggle(LED_BUTTON_A);
+    for (unsigned int i = 0; i < 2*((int)mode+1); i++) {
+		if (led)
+			digitalToggle(LED_BUTTON_A);
+		else
+			digitalToggle(LED_BUTTON_B);
       delay(500);
     }
     digitalWrite(LED_BUTTON_A, LOW);
+    digitalWrite(LED_BUTTON_B, LOW);
 }
 
 void updateButtons() {
@@ -267,7 +361,7 @@ void updateButtons() {
     digitalWrite(LED_BUTTON_A, LOW);
     digitalWrite(LED_BUTTON_B, LOW);
     delay(1000);
-    indicateMode();
+    indicateMode((uint8_t)currentMode, true);
   }
   /*------------------------------------------------------------------*/
 }
@@ -418,6 +512,8 @@ void setupDigitalIO() {
 
 bool writeSettings() {
     char modeStr[8];
+    char orientationStr[8];
+    char settingsStr[16];
 
     // Settings file does not exist, we need to create it
     if (DEBUG)
@@ -431,7 +527,17 @@ bool writeSettings() {
       file.seek(0);
 
       itoa((int)currentMode, modeStr, 10);
-      file.write(modeStr, strlen(modeStr));
+      itoa((int)buttonOrientation, orientationStr, 10);
+      strcpy(settingsStr, modeStr);
+      strcat(settingsStr, ",");
+      strcat(settingsStr, orientationStr);
+      
+      if (DEBUG) {
+        Serial.print("Writing to settings file: ");
+        Serial.println(settingsStr);
+	  }
+	  
+      file.write(settingsStr, strlen(settingsStr));
       file.close();
 
       return true;
@@ -444,6 +550,7 @@ bool writeSettings() {
     }
 }
 
+// return true for error
 bool readSettings() {
   file.open(FILENAME, FILE_O_READ);
   // Does settings file already exist?
@@ -453,32 +560,50 @@ bool readSettings() {
       Serial.println(FILENAME " settings file exists, reading...");
     
     uint32_t readlen;
-    char buffer[8] = { 0 };
+    char buffer[16] = { 0 };
     readlen = file.read(buffer, sizeof(buffer));
 
     buffer[readlen] = 0;
     if (DEBUG) {
-      Serial.print("Mode: ");
+      Serial.print("Read from settings: ");
       Serial.println(buffer);
     }
     file.close();
+    
+    // split the settings from a common separated list of values to individual variables
+    char* token = strtok(buffer, ",");
+    if (token) {
+		// first value is the app mode
+		int n = atoi(token);
+		if (n < 0 || (n > N_MODES-1)) {
+		  if (DEBUG)
+			Serial.println("Invalid mode value, setting to zero.");
+		  n = 0;
+		  return true; // error
+		}
+		currentMode = (Mode)n;
+		token = strtok(NULL, " ");
+	}
+    if (token) {
+		// second value is the device orientation
+		int n = atoi(token);
+		if (n < 0 || n > 3) {
+		  if (DEBUG)
+			Serial.println("Invalid orientation value, setting to default.");
+		  n = DEFAULT_BUTTON_MAP;
+		  return true; // error
+		}
+		buttonOrientation = (uint8_t)n;
+		setButtonMapping(buttonOrientation);
+	}
 
-    // Store the current mode
-    int n = atoi(buffer);
-    if (n < 0 || (n > N_MODES-1)) {
-      if (DEBUG)
-        Serial.println("Invalid mode value, setting to zero.");
-      n = 0;
-    }
-    currentMode = (Mode)n;
-
-    return true;
+    return false; // no error
   }
   else {
     if (DEBUG)
       Serial.println(FILENAME " settings file not found.");
     
-    return false;
+    return true;
   }
 }
 
@@ -521,16 +646,39 @@ void setup()
 
   // Initialize Internal File System
   InternalFS.begin();
+  
+  // let the user change the orientation of the device at startup
+  int buttonMap = getButtonMapSelection();
+  if (buttonMap >= 0) {
+	buttonOrientation = (uint8_t)buttonMap;
+	setButtonMapping(buttonOrientation);
+	
+	if (DEBUG) {
+		Serial.print("Button orientation changed to: ");
+        Serial.println(buttonOrientation);
+	}
+	
+	// Indicate new button mode selection
+	indicateMode(buttonOrientation, false);
+	delay(1000);
+  }
+  else
+	Serial.println("Button orientation not changed.");
 
   // Restore settings
   bool success = false;
   success = readSettings();
-  if (!success)
+  // new selection for buttonMap/orientation gets overwritten by readSettings
+  if (buttonMap >= 0) {
+	buttonOrientation = (uint8_t)buttonMap;
+	setButtonMapping(buttonOrientation);
+  }
+  if (!success || buttonMap >= 0)
     writeSettings();
 
   digitalWrite(LED_BUTTON_A, LOW);
   digitalWrite(LED_BUTTON_B, LOW);
-  indicateMode();
+  indicateMode((uint8_t)currentMode, true);
   delay(1000);
 }
 

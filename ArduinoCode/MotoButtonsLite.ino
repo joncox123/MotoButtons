@@ -1,7 +1,7 @@
 /*********************************************************************
 author: joncox@alum.mit.edu
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
-Version: 1.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
+Version: 1.1.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -11,8 +11,11 @@ Version: 1.1 with support for the following modes: DMD2, mouse cursor, MyRoute A
 
 using namespace Adafruit_LittleFS_Namespace;
 
+// Enable serial debugging (turn this off if not connected to PC)
+#define DEBUG false
+
 // How long to wait until DFU reset mode is activated
-#define MODE_RESET_MS 10000
+#define MODE_RESET_MS 15000
 
 /*----- Persistent Storage Filesystem -----*/
 // This is used to store settings, such as the last mode
@@ -26,7 +29,7 @@ BLEHidAdafruit blehid;
 // BLE configuration
 #define BLE_TX_POWER 8
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.1";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.1.1";
 const char BLE_MANUFACTURER[] = "Me";
 bool BLE_connected = false;
 
@@ -197,7 +200,8 @@ void updateButtons() {
   if (button_center_state && (millis() - button_center_time > MODE_TOGGLE_MS)) {
     // virtual button is active
     if (!button_virtual_state) {
-      Serial.println("Virtual button activated.");
+      if (DEBUG)
+        Serial.println("Virtual button activated.");
       button_virtual_time = millis();
       button_virtual_flipped = true;
       stateChanged |= true;
@@ -210,7 +214,8 @@ void updateButtons() {
   else {
     // virtual button is not active
     if (button_virtual_state) {
-      Serial.println("Virtual button deactivated.");
+      if (DEBUG)
+        Serial.println("Virtual button deactivated.");
       digitalWrite(LED_BUTTON_A, LOW);
       stateChanged |= true;
     }
@@ -226,7 +231,8 @@ void updateButtons() {
    * from the Arduino IDE if a BLE sketch is uploaded previously. Thus, it is necessary to enter via triggering a DFU reset event.
    */
   if (button_A_state && button_B_state && (millis() - button_A_time > MODE_RESET_MS) && (millis() - button_B_time > MODE_RESET_MS)) {
-    Serial.println("Resetting and entering firmware update (FDU) mode...");
+    if (DEBUG)
+      Serial.println("Resetting and entering firmware update (FDU) mode...");
     enterSerialDfu();
   }
 
@@ -239,8 +245,10 @@ void updateButtons() {
   if (button_A_state && button_B_state && (millis() - button_A_time > MODE_TOGGLE_MS) && (millis() - button_B_time > MODE_TOGGLE_MS) && modeButtonsReleased) {
     // Buttons A and B were both long-pressed, which means we should advance the mode
     currentMode = (Mode)(((int)currentMode + 1) % N_MODES);
-    Serial.print("Mode advanced to ");
-    Serial.println(currentMode);
+    if (DEBUG) {
+      Serial.print("Mode advanced to ");
+      Serial.println(currentMode);
+    }
     
     // Since mode has been changed, inactivate any ongoing key or mouse presses
     releaseAllKeys();
@@ -412,10 +420,12 @@ bool writeSettings() {
     char modeStr[8];
 
     // Settings file does not exist, we need to create it
-    Serial.print("Creating " FILENAME " to store settings...");
+    if (DEBUG)
+      Serial.print("Creating " FILENAME " to store settings...");
 
     if (file.open(FILENAME, FILE_O_WRITE)) {
-      Serial.println("File opened successfully.");
+      if (DEBUG)
+        Serial.println("File opened successfully.");
       // file is opened in append mode by default
       file.truncate(0);
       file.seek(0);
@@ -427,7 +437,8 @@ bool writeSettings() {
       return true;
     }
     else {
-      Serial.println("Error writing settings file!");
+      if (DEBUG)
+        Serial.println("Error writing settings file!");
 
       return false;
     }
@@ -438,21 +449,25 @@ bool readSettings() {
   // Does settings file already exist?
   if (file) {
     // File already exists
-    Serial.println(FILENAME " settings file exists, reading...");
+    if (DEBUG)
+      Serial.println(FILENAME " settings file exists, reading...");
     
     uint32_t readlen;
     char buffer[8] = { 0 };
     readlen = file.read(buffer, sizeof(buffer));
 
     buffer[readlen] = 0;
-    Serial.print("Mode: ");
-    Serial.println(buffer);
+    if (DEBUG) {
+      Serial.print("Mode: ");
+      Serial.println(buffer);
+    }
     file.close();
 
     // Store the current mode
     int n = atoi(buffer);
     if (n < 0 || (n > N_MODES-1)) {
-      Serial.println("Invalid mode value, setting to zero.");
+      if (DEBUG)
+        Serial.println("Invalid mode value, setting to zero.");
       n = 0;
     }
     currentMode = (Mode)n;
@@ -460,7 +475,8 @@ bool readSettings() {
     return true;
   }
   else {
-    Serial.println(FILENAME " settings file not found.");
+    if (DEBUG)
+      Serial.println(FILENAME " settings file not found.");
     
     return false;
   }
@@ -472,12 +488,14 @@ void setup()
   
   setupDigitalIO();
 
-  Serial.begin(115200);
-  while ( !Serial ) delay(10);   // for nrf52840 with native usb
+  if (DEBUG) {
+    Serial.begin(115200);
+    while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
-  Serial.println("MotoButtons BLE Controller");
-  Serial.println("-----------------------------\n");
-  Serial.println();
+    Serial.println("MotoButtons BLE Controller");
+    Serial.println("-----------------------------\n");
+    Serial.println();
+  }
 
   Bluefruit.begin();
   // HID Device can have a min connection interval of 9*1.25 = 11.25 ms
@@ -496,7 +514,8 @@ void setup()
   // Set up and start advertising
   startAdv();
 
-  Serial.println("Setup complete.");
+  if (DEBUG)
+    Serial.println("Setup complete.");
   digitalWrite(LED_BUTTON_A, HIGH);
   digitalWrite(LED_BUTTON_B, HIGH);
 
@@ -548,7 +567,8 @@ void loop()
 {
   // Indicate whether the device is connected and running
   if (!BLE_connected && (Bluefruit.connected() > 0)) {
-    Serial.println("BLE connected to host.");
+    if (DEBUG)
+      Serial.println("BLE connected to host.");
     digitalWrite(LED_BUTTON_A, LOW);
     digitalWrite(LED_BUTTON_B, LOW);
     BLE_connected = true;

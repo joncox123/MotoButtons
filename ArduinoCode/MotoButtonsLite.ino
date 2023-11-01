@@ -19,6 +19,9 @@ using namespace Adafruit_LittleFS_Namespace;
 #define DEFAULT_BUTTON_MAP 2
 uint8_t buttonOrientation = DEFAULT_BUTTON_MAP;
 
+// how long to inactivate up/down/left/right on joystick when center is pressed
+#define BUTTON_CENTER_TIMEOUT 500 // ms
+
 /*----- Persistent Storage Filesystem -----*/
 // This is used to store settings, such as the last mode
 #define FILENAME    "/MotoButtons.set"
@@ -233,6 +236,19 @@ bool setButtonMapping(uint8_t buttMap) {
 	return false;
 }
 
+// This function returns true if the center button is in an active state
+// if so, the program should ignore up/down/left/right on the joystick
+bool isCenterActive() {
+	if (button_center_state)
+		return true;
+	if (digitalRead(BUTTON_CENTER))
+		return true;
+	if (millis() - button_center_time < BUTTON_CENTER_TIMEOUT)
+		return true;
+	
+	return false;
+}
+
 //if  This function should be called rapidly in a loop to update the debounce filter and key state
 // https://docs.arduino.cc/built-in-examples/digital/Debounce
 bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *buttonFlipped,
@@ -368,26 +384,29 @@ void updateButtons() {
 
 void mapButtonsToKeyReport() {
 	unsigned int i = 0;
+	
+	bool centerActive = isCenterActive();
 
 	switch (currentMode) {
 		case DMD2:
-			if (button_up_state && !button_center_state) {
+			if (button_up_state && !centerActive) {
 			  keyReport[i] = DMD_KEY_UP;
 			  ++i;
 			}
-			if (button_down_state && !button_center_state) {
+			if (button_down_state && !centerActive) {
 			  keyReport[i] = DMD_KEY_DOWN;
 			  ++i;
 			}
-			if (button_left_state && !button_center_state) {
+			if (button_left_state && !centerActive) {
 			  keyReport[i] = DMD_KEY_LEFT;
 			  ++i;
 			}
-			if (button_right_state && !button_center_state) {
+			if (button_right_state && !centerActive) {
 			  keyReport[i] = DMD_KEY_RIGHT;
 			  ++i;
 			}
-			if (button_center_state) {
+			if (button_center_state && button_center_flipped) {
+			  button_center_flipped = false;
 			  keyReport[i] = DMD_KEY_CENTER;
 			  ++i;
 			}
@@ -412,23 +431,24 @@ void mapButtonsToKeyReport() {
 			}
 			break;
 		case MRA:
-			if (button_up_state && !button_center_state) {
+			if (button_up_state && !centerActive) {
 			  keyReport[i] = MRA_KEY_UP;
 			  ++i;
 			}
-			if (button_down_state && !button_center_state) {
+			if (button_down_state && !centerActive) {
 			  keyReport[i] = MRA_KEY_DOWN;
 			  ++i;
 			}
-			if (button_left_state && !button_center_state) {
+			if (button_left_state && !centerActive) {
 			  keyReport[i] = MRA_KEY_LEFT;
 			  ++i;
 			}
-			if (button_right_state && !button_center_state) {
+			if (button_right_state && !centerActive) {
 			  keyReport[i] = MRA_KEY_RIGHT;
 			  ++i;
 			}
-			if (button_center_state) {
+			if (button_center_state && button_center_flipped) {
+				button_center_flipped = false;
 			  keyReport[i] = MRA_KEY_CENTER;
 			  ++i;
 			}
@@ -472,7 +492,7 @@ void handleMouse() {
       }
 
       // Move pointer
-      if (!button_center_state) {
+      if (!isCenterActive()) {
         int rate = MOUSE_RATE_SLOW;
         unsigned long currTimeMs = millis();
         if (((currTimeMs - button_up_time > MOUSE_RATE_DELAY) && button_up_state) ||
@@ -660,7 +680,7 @@ void setup()
 	
 	// Indicate new button mode selection
 	indicateMode(buttonOrientation, false);
-	delay(1000);
+	delay(250);
   }
   else
 	Serial.println("Button orientation not changed.");
@@ -679,7 +699,7 @@ void setup()
   digitalWrite(LED_BUTTON_A, LOW);
   digitalWrite(LED_BUTTON_B, LOW);
   indicateMode((uint8_t)currentMode, true);
-  delay(1000);
+  delay(250);
 }
 
 void startAdv(void)

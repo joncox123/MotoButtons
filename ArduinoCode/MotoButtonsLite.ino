@@ -1,6 +1,6 @@
 /*********************************************************************
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
-Version: 1.2.1 with support for the following modes: DMD2, mouse cursor, MyRoute App
+Version: 1.2.2 with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -34,7 +34,7 @@ BLEHidAdafruit blehid;
 // BLE configuration
 #define BLE_TX_POWER 8
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.1";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.2";
 const char BLE_MANUFACTURER[] = "Me";
 bool BLE_connected = false;
 
@@ -94,6 +94,7 @@ const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N;
 #define N_KEY_REPORT 6
 uint8_t keyReport[N_KEY_REPORT] = {HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE, HID_KEY_NONE};
 bool keyReportChanged = false;
+bool forceKeyReport = false; // used to force another key report for key up activation events
 
 // Digital IO pin mapping (default)
 uint8_t BUTTON_UP      = 4;
@@ -106,7 +107,7 @@ uint8_t BUTTON_B       = 6;
 uint8_t LED_BUTTON_A   = 7;
 uint8_t LED_BUTTON_B   = 8;
 
-#define DEBOUNCE_TIME_MS 20
+#define DEBOUNCE_TIME_MS 50
 
 // state of buttons
 bool button_up_state      = false;
@@ -136,6 +137,9 @@ bool button_center_flipped  = false;
 bool button_A_flipped       = false;
 bool button_B_flipped       = false;
 bool button_virtual_flipped = false;
+
+// a flag to indicate that virtual button was released, for center timeout purposes only
+bool button_virtual_timeout = false;
 
 // last time that button transitioned from low to high
 unsigned long button_up_time      = 0;
@@ -249,6 +253,14 @@ bool isCenterActive() {
 	return false;
 }
 
+
+bool isVirtualActive() {
+	if (millis() - button_virtual_time < BUTTON_CENTER_TIMEOUT)
+		return true;
+	
+	return button_virtual_state;
+}
+
 //if  This function should be called rapidly in a loop to update the debounce filter and key state
 // https://docs.arduino.cc/built-in-examples/digital/Debounce
 bool debounceButton(unsigned int button, bool *state, bool *priorState, bool *buttonFlipped,
@@ -308,7 +320,7 @@ void updateButtons() {
   
   /* ----------- Detect state of virtual buttons ---------------------*/
   if (button_center_state && (millis() - button_center_time > MODE_TOGGLE_MS)) {
-    // virtual button is active
+	//virtual button activated
     if (!button_virtual_state) {
       if (DEBUG)
         Serial.println("Virtual button activated.");
@@ -317,20 +329,32 @@ void updateButtons() {
       stateChanged |= true;
 
       // indicate virtual button
+      digitalToggle(LED_BUTTON_A);
       digitalWrite(LED_BUTTON_A, HIGH);
     }
     button_virtual_state = true;
   }
-  else {
+  else if (button_virtual_state) {
     // virtual button is not active
-    if (button_virtual_state) {
-      if (DEBUG)
-        Serial.println("Virtual button deactivated.");
-      digitalWrite(LED_BUTTON_A, LOW);
-      stateChanged |= true;
-    }
-    button_virtual_state = false;
+	button_virtual_flipped = true;
+	button_virtual_state = false;
+	button_virtual_timeout = true;
+	button_virtual_time = millis();
+    if (DEBUG) Serial.println("Virtual button deactivated, timeout enabled.");
+    digitalToggle(LED_BUTTON_A);
+    digitalWrite(LED_BUTTON_A, LOW);
+    stateChanged |= true;
   }
+  
+  // Also, a race condition can occur where the virtual button is released and the center flips from high to low, activating the center
+  // Therefore, the release action of the virtual button is to disable the center button for a period of time
+  if (button_virtual_timeout)
+	button_center_flipped = false;
+  if (button_virtual_timeout && (millis() - button_virtual_time > BUTTON_CENTER_TIMEOUT)) {
+	button_virtual_timeout = false;
+	if (DEBUG) Serial.println("Virtual button timeout disabled.");
+  }
+	
   /*------------------------------------------------------------------*/
 
   // Indicate whether any buttons changed state
@@ -386,6 +410,7 @@ void mapButtonsToKeyReport() {
 	unsigned int i = 0;
 	
 	bool centerActive = isCenterActive();
+	bool virtualActive = isVirtualActive();
 
 	switch (currentMode) {
 		case DMD2:
@@ -405,20 +430,24 @@ void mapButtonsToKeyReport() {
 			  keyReport[i] = DMD_KEY_RIGHT;
 			  ++i;
 			}
-			if (button_center_state && button_center_flipped) {
+			if (!button_center_state && button_center_flipped && !virtualActive) {
 			  button_center_flipped = false;
+			  forceKeyReport = true;
 			  keyReport[i] = DMD_KEY_CENTER;
 			  ++i;
 			}
-			if (button_A_state) {
+			if (button_A_state & button_A_flipped && !button_B_state) {
+			  button_A_flipped = false;
 			  keyReport[i] = DMD_KEY_A;
 			  ++i;
 			}
-			if (button_B_state && (i < N_KEY_REPORT)) {
+			if (button_B_state && button_B_flipped && !button_A_state && (i < N_KEY_REPORT)) {
+			  button_B_flipped = false;
 			  keyReport[i] = DMD_KEY_B;
 			  ++i;
 			}
-			if (button_virtual_state && (i < N_KEY_REPORT)) {
+			if (button_virtual_state && (i < N_KEY_REPORT) && button_virtual_flipped) {
+			  button_virtual_flipped = false;
 			  keyReport[i] = DMD_KEY_VIRTUAL;
 			  ++i;
 			}
@@ -432,35 +461,47 @@ void mapButtonsToKeyReport() {
 			break;
 		case MRA:
 			if (button_up_state && !centerActive) {
+		      if (DEBUG) Serial.println("UP");
 			  keyReport[i] = MRA_KEY_UP;
 			  ++i;
 			}
 			if (button_down_state && !centerActive) {
+			  if (DEBUG) Serial.println("DOWN");
 			  keyReport[i] = MRA_KEY_DOWN;
 			  ++i;
 			}
 			if (button_left_state && !centerActive) {
+			  if (DEBUG) Serial.println("LEFT");
 			  keyReport[i] = MRA_KEY_LEFT;
 			  ++i;
 			}
 			if (button_right_state && !centerActive) {
+			  if (DEBUG) Serial.println("RIGHT");
 			  keyReport[i] = MRA_KEY_RIGHT;
 			  ++i;
 			}
-			if (button_center_state && button_center_flipped) {
-				button_center_flipped = false;
+			if (!button_center_state && button_center_flipped && !virtualActive) {
+			  if (DEBUG) Serial.println("CENTER");
+			  button_center_flipped = false;
+			  forceKeyReport = true;
 			  keyReport[i] = MRA_KEY_CENTER;
 			  ++i;
 			}
-			if (button_A_state) {
+			if (button_A_state && button_A_flipped && !button_B_state) {
+			  if (DEBUG) Serial.println("A");
+			  button_A_flipped = false;
 			  keyReport[i] = MRA_KEY_A;
 			  ++i;
 			}
-			if (button_B_state && (i < N_KEY_REPORT)) {
+			if (button_B_state && button_B_flipped && !button_A_state && (i < N_KEY_REPORT)) {
+			  if (DEBUG) Serial.println("B");
+			  button_B_flipped = false;
 			  keyReport[i] = MRA_KEY_B;
 			  ++i;
 			}
-			if (button_virtual_state && (i < N_KEY_REPORT)) {
+			if (button_virtual_state && (i < N_KEY_REPORT) && button_virtual_flipped) {
+			  if (DEBUG) Serial.println("VIRTUAL");
+			  button_virtual_flipped = false;
 			  keyReport[i] = MRA_KEY_VIRTUAL;
 			  ++i;
 			}
@@ -753,9 +794,11 @@ void loop()
   
   if (BLE_connected) {
 	  // Compile the BLE HID key report
-	  if (keyReportChanged) {
+	  if (keyReportChanged || forceKeyReport) {
+		forceKeyReport = false;
 		mapButtonsToKeyReport();
 		blehid.keyboardReport(0, keyReport);
+		if (DEBUG) Serial.println("Key report sent.");
 	  }
 	  
 	  if (currentMode == mouse)

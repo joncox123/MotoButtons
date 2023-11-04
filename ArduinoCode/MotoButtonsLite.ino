@@ -1,6 +1,6 @@
 /*********************************************************************
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
-Version: 1.2.2 with support for the following modes: DMD2, mouse cursor, MyRoute App
+Version: 1.2.2B with support for the following modes: DMD2, mouse cursor, MyRoute App
 *********************************************************************/
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -34,7 +34,7 @@ BLEHidAdafruit blehid;
 // BLE configuration
 #define BLE_TX_POWER 8
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.2";
+const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.2B";
 const char BLE_MANUFACTURER[] = "Me";
 bool BLE_connected = false;
 
@@ -795,6 +795,7 @@ void loop()
   if (BLE_connected) {
 	  // Compile the BLE HID key report
 	  if (keyReportChanged || forceKeyReport) {
+		delay(100); // <-- CHANGE DELAY HERE!
 		forceKeyReport = false;
 		mapButtonsToKeyReport();
 		blehid.keyboardReport(0, keyReport);

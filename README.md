@@ -1,4 +1,4 @@
-# MotoButtons Lite
+# MotoButtons
 
 ### Update 3/4/2024: Media (music) mode has been added as a forth mode. This has been tested on Android, but should work on iOS in theory.
 

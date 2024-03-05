@@ -1,6 +1,6 @@
 # MotoButtons
 
-### Update 3/4/2024: Media (music) mode has been added as a forth mode. This has been tested on Android, but should work on iOS in theory.
+### Update 3/4/2024: Media (music) mode has been added as a forth mode.
 
 A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) and [MyRoute App](https://www.myrouteapp.com/) motorcycle navigation with joystick and mouse mode. The cost is only $28 in parts.
 

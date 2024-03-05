@@ -93,13 +93,13 @@ const uint8_t MRA_KEY_B       = HID_KEY_MINUS;
 const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N; // long press for skip waypoint
 
 /* Media Mode Configuration */
-const uint8_t MEDIA_KEY_UP      = 0xED; // volume up
-const uint8_t MEDIA_KEY_DOWN    = 0xEE; // volume down
-const uint8_t MEDIA_KEY_LEFT    = 0xEA; // previous song
-const uint8_t MEDIA_KEY_RIGHT   = 0xEB; // next song 
-const uint8_t MEDIA_KEY_CENTER  = 0xEF; // Mute
-const uint8_t MEDIA_KEY_A       = 0xE8; // play - pause
-const uint8_t MEDIA_KEY_B       = 0xE9; // stop music
+const uint8_t MEDIA_KEY_UP      = HID_USAGE_CONSUMER_VOLUME_INCREMENT; // volume up
+const uint8_t MEDIA_KEY_DOWN    = HID_USAGE_CONSUMER_VOLUME_DECREMENT; // volume down
+const uint8_t MEDIA_KEY_LEFT    = HID_USAGE_CONSUMER_SCAN_PREVIOUS; // previous song
+const uint8_t MEDIA_KEY_RIGHT   = HID_USAGE_CONSUMER_SCAN_NEXT; // next song 
+const uint8_t MEDIA_KEY_CENTER  = HID_USAGE_CONSUMER_MUTE; // Mute
+const uint8_t MEDIA_KEY_A       = HID_USAGE_CONSUMER_PLAY_PAUSE; // play - pause
+const uint8_t MEDIA_KEY_B       = HID_USAGE_CONSUMER_STOP; // stop music
 /*---------------------- END MODE CONFIGURATION ----------------------*/
 
 /*----------------- BUTTON CONFIGURATION AND LOGIC -------------------*/
@@ -523,43 +523,51 @@ void mapButtonsToKeyReport() {
 			break;
     
     case MEDIA:
+    // the media keys must be reported via a different ("consumer") function to work on iOS
 			if (button_up_state && !centerActive) {
-		      if (DEBUG) Serial.println("Media key UP");
-			  keyReport[i] = MEDIA_KEY_UP;
+		    if (DEBUG) Serial.println("Media key UP");
+			  blehid.consumerKeyPress(0, MEDIA_KEY_UP);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (button_down_state && !centerActive) {
 			  if (DEBUG) Serial.println("Media key DOWN");
-			  keyReport[i] = MEDIA_KEY_DOWN;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_DOWN);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (button_left_state && !centerActive) {
 			  if (DEBUG) Serial.println("Media key LEFT");
-			  keyReport[i] = MEDIA_KEY_LEFT;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_LEFT);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (button_right_state && !centerActive) {
 			  if (DEBUG) Serial.println("Media key RIGHT");
-			  keyReport[i] = MEDIA_KEY_RIGHT;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_RIGHT);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (!button_center_state && button_center_flipped && !virtualActive) {
 			  if (DEBUG) Serial.println("Media key CENTER");
 			  button_center_flipped = false;
 			  forceKeyReport = true;
-			  keyReport[i] = MEDIA_KEY_CENTER;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_CENTER);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (button_A_state && button_A_flipped && !button_B_state) {
 			  if (DEBUG) Serial.println("Media key A");
 			  button_A_flipped = false;
-			  keyReport[i] = MEDIA_KEY_A;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_A);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			if (button_B_state && button_B_flipped && !button_A_state && (i < N_KEY_REPORT)) {
 			  if (DEBUG) Serial.println("Media key B");
 			  button_B_flipped = false;
-			  keyReport[i] = MEDIA_KEY_B;
+			  blehid.consumerKeyPress(0, MEDIA_KEY_B);
+        blehid.consumerKeyRelease(0);
 			  ++i;
 			}
 			break;
@@ -853,10 +861,10 @@ void loop()
   if (BLE_connected) {
 	  // Compile the BLE HID key report
 	  if (keyReportChanged || forceKeyReport) {
-		forceKeyReport = false;
-		mapButtonsToKeyReport();
-		blehid.keyboardReport(0, keyReport);
-		if (DEBUG) Serial.println("Key report sent.");
+      forceKeyReport = false;
+      mapButtonsToKeyReport();
+      blehid.keyboardReport(0, keyReport);
+      if (DEBUG) Serial.println("Key report sent.");
 	  }
 	  
 	  if (currentMode == mouse)

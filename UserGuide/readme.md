@@ -9,8 +9,9 @@ MotoButtons supports multiple modes of operation, including:
 1. Mouse cursor mode
 2. Drivemode Dashboard 2 mode
 3. MyRoute App mode
+4. Media (music) mode
 
-MotoButtons can be cycled through these modes, in that order (Mouse->DMD2->MRA) by holding down both A and B buttons for 1 second. When advancing the mode, both LEDs will flash rapidly for 2 seconds. Then LED A will flash to indicate the mode number (one flash for mouse, two flashes for DMD2, three flashes for MyRoute App). 
+MotoButtons can be cycled through these modes, in that order (Mouse->DMD2->MRA->Media) by holding down both A and B buttons for 1 second. When advancing the mode, both LEDs will flash rapidly for 2 seconds. Then LED A will flash to indicate the mode number (one flash for mouse, two flashes for DMD2, three flashes for MyRoute App). 
 
 The mode state will be saved so that the last mode prior to power down will be activated at the next power up. In other words, if you keep your MotoButtons set to MyRoute App mode, it will remember that when you use it next. Upon boot, the mode will be indicated by flashing the mode number.
 
@@ -26,7 +27,10 @@ The joystick controls up/down/left/right, accordingly. A button activated F5, B 
 ### MyRoute App Mode
 First, you must set MyRoute App to use the "BarButtons" controller. This provides the necessary functionality and MyRoute App will interpret the button presses correctly.
 
-When in MyRoute App mode, the joystick will pan the map view. Buttons A and B will zoom the map view in and out. Tapping the joystick center button will center the map. Long pressing the joystick center will activate the menu.
+When in MyRoute App mode, the joystick will pan the map view. Buttons A and B will zoom the map view in and out. Tapping the joystick center button will center the map. Long pressing the joystick center will activate the menu. In theory, continuing to hold the joystick center button should skip waypoint.
+
+### Media (music) Mode
+This mode allows you to control your music. Press up or down on the joystick to change the volume. Pressing the joystick center will mute. Press left or right on the joystick to go to previous or next track, respectively. Button A will play or pause the music, while button B will stop all music.
 
 ## Rotating the Orientation
 Since MotoButtons may be installed on the motorcycle in any orientation, it is sometimes necessary to rotate the orientation of the joystick. This can be done by holding down the joystick in the direction you want to be the new "up" direction, while powering on. In other words, let's say you want to mount the device upside down. Then you would press "down" on the joystick (it will now be upward when mounted upside down), then while holding this direction, apply power to the device. The change should be stored within a couple of seconds. 

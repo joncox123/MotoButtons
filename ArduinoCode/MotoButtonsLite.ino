@@ -1,6 +1,7 @@
 /*********************************************************************
 License: GNU GENERAL PUBLIC LICENSE; Version 3, 29 June 2007
-Version: 1.2.2 with support for the following modes: DMD2, mouse cursor, MyRoute App
+Version: 1.3 with support for the following modes: DMD2, mouse cursor, MyRoute App, media (music)
+Device: Seeed XIAO nRF52840
 *********************************************************************/
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
@@ -16,6 +17,7 @@ using namespace Adafruit_LittleFS_Namespace;
 // How long to wait until DFU reset mode is activated
 #define MODE_RESET_MS 15000
 
+// Orientation of controller
 #define DEFAULT_BUTTON_MAP 2
 uint8_t buttonOrientation = DEFAULT_BUTTON_MAP;
 
@@ -34,7 +36,7 @@ BLEHidAdafruit blehid;
 // BLE configuration
 #define BLE_TX_POWER 8
 const char BLE_DEVICE_NAME[] = "DMD2 CTL 8K";
-const char BLE_DEVICE_MODEL[] = "MotoButtons Lite 1.2.2";
+const char BLE_DEVICE_MODEL[] = "MotoButtons 1.3";
 const char BLE_MANUFACTURER[] = "Me";
 bool BLE_connected = false;
 
@@ -42,15 +44,17 @@ bool BLE_connected = false;
  * --------------------- MODE CONFIGURATION ----------------------------
  * 	DMD2: up/down/left/right arrows, enter, F6 and F7
  * 	Mouse: mouse up/down/left/right, left click, left click, ?
- * 	MRA: up/down/left/right arrows, 'c', -, +, longpress center for 'n'
+ * 	MyRouteApp: up/down/left/right arrows, 'c', -, +, longpress center for 'n' (hold center for skip waypoint)
+ *  Media (music): vol up, vol down, previous track, next track, mute, play/pause, stop
  */
 // Selected Mode: indicates the currently selected operating mode
 #define MODE_TOGGLE_MS 1000
-#define N_MODES 3
+#define N_MODES 4
 enum Mode {
 	mouse = 0,
-    DMD2  = 1,
-	MRA   = 2
+  DMD2  = 1,
+	MRA   = 2,
+  MEDIA = 3
 };
 enum Mode currentMode;
 
@@ -78,7 +82,7 @@ const uint8_t DMD_KEY_VIRTUAL = HID_KEY_F7;
 bool mouse_left_button_pressed = false;
 const uint8_t MOUSE_KEY_A     = HID_KEY_ENTER;
 
-/* MRA Mode Configuration */
+/* MyRouteApp Mode Configuration */
 const uint8_t MRA_KEY_UP      = HID_KEY_ARROW_UP;
 const uint8_t MRA_KEY_DOWN    = HID_KEY_ARROW_DOWN;
 const uint8_t MRA_KEY_LEFT    = HID_KEY_ARROW_LEFT;
@@ -86,7 +90,16 @@ const uint8_t MRA_KEY_RIGHT   = HID_KEY_ARROW_RIGHT;
 const uint8_t MRA_KEY_CENTER  = HID_KEY_C;
 const uint8_t MRA_KEY_A       = HID_KEY_KEYPAD_ADD;
 const uint8_t MRA_KEY_B       = HID_KEY_MINUS;
-const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N;
+const uint8_t MRA_KEY_VIRTUAL = HID_KEY_N; // long press for skip waypoint
+
+/* Media Mode Configuration */
+const uint8_t MEDIA_KEY_UP      = 0xED; // volume up
+const uint8_t MEDIA_KEY_DOWN    = 0xEE; // volume down
+const uint8_t MEDIA_KEY_LEFT    = 0xEA; // previous song
+const uint8_t MEDIA_KEY_RIGHT   = 0xEB; // next song 
+const uint8_t MEDIA_KEY_CENTER  = 0xEF; // Mute
+const uint8_t MEDIA_KEY_A       = 0xE8; // play - pause
+const uint8_t MEDIA_KEY_B       = 0xE9; // stop music
 /*---------------------- END MODE CONFIGURATION ----------------------*/
 
 /*----------------- BUTTON CONFIGURATION AND LOGIC -------------------*/
@@ -452,6 +465,7 @@ void mapButtonsToKeyReport() {
 			  ++i;
 			}
 			break;
+
 		case mouse:
 			if (button_A_state && button_A_flipped) {
 			  keyReport[0] = MOUSE_KEY_A;
@@ -459,53 +473,97 @@ void mapButtonsToKeyReport() {
 			  button_A_flipped = false;
 			}
 			break;
+
 		case MRA:
 			if (button_up_state && !centerActive) {
-		      if (DEBUG) Serial.println("UP");
+		      if (DEBUG) Serial.println("MRA UP");
 			  keyReport[i] = MRA_KEY_UP;
 			  ++i;
 			}
 			if (button_down_state && !centerActive) {
-			  if (DEBUG) Serial.println("DOWN");
+			  if (DEBUG) Serial.println("MRA DOWN");
 			  keyReport[i] = MRA_KEY_DOWN;
 			  ++i;
 			}
 			if (button_left_state && !centerActive) {
-			  if (DEBUG) Serial.println("LEFT");
+			  if (DEBUG) Serial.println("MRA LEFT");
 			  keyReport[i] = MRA_KEY_LEFT;
 			  ++i;
 			}
 			if (button_right_state && !centerActive) {
-			  if (DEBUG) Serial.println("RIGHT");
+			  if (DEBUG) Serial.println("MRA RIGHT");
 			  keyReport[i] = MRA_KEY_RIGHT;
 			  ++i;
 			}
 			if (!button_center_state && button_center_flipped && !virtualActive) {
-			  if (DEBUG) Serial.println("CENTER");
+			  if (DEBUG) Serial.println("MRA CENTER");
 			  button_center_flipped = false;
 			  forceKeyReport = true;
 			  keyReport[i] = MRA_KEY_CENTER;
 			  ++i;
 			}
 			if (button_A_state && button_A_flipped && !button_B_state) {
-			  if (DEBUG) Serial.println("A");
+			  if (DEBUG) Serial.println("MRA A");
 			  button_A_flipped = false;
 			  keyReport[i] = MRA_KEY_A;
 			  ++i;
 			}
 			if (button_B_state && button_B_flipped && !button_A_state && (i < N_KEY_REPORT)) {
-			  if (DEBUG) Serial.println("B");
+			  if (DEBUG) Serial.println("MRA B");
 			  button_B_flipped = false;
 			  keyReport[i] = MRA_KEY_B;
 			  ++i;
 			}
 			if (button_virtual_state && (i < N_KEY_REPORT) && button_virtual_flipped) {
-			  if (DEBUG) Serial.println("VIRTUAL");
+			  if (DEBUG) Serial.println("MRA VIRTUAL");
 			  button_virtual_flipped = false;
 			  keyReport[i] = MRA_KEY_VIRTUAL;
 			  ++i;
 			}
 			break;
+    
+    case MEDIA:
+			if (button_up_state && !centerActive) {
+		      if (DEBUG) Serial.println("Media key UP");
+			  keyReport[i] = MEDIA_KEY_UP;
+			  ++i;
+			}
+			if (button_down_state && !centerActive) {
+			  if (DEBUG) Serial.println("Media key DOWN");
+			  keyReport[i] = MEDIA_KEY_DOWN;
+			  ++i;
+			}
+			if (button_left_state && !centerActive) {
+			  if (DEBUG) Serial.println("Media key LEFT");
+			  keyReport[i] = MEDIA_KEY_LEFT;
+			  ++i;
+			}
+			if (button_right_state && !centerActive) {
+			  if (DEBUG) Serial.println("Media key RIGHT");
+			  keyReport[i] = MEDIA_KEY_RIGHT;
+			  ++i;
+			}
+			if (!button_center_state && button_center_flipped && !virtualActive) {
+			  if (DEBUG) Serial.println("Media key CENTER");
+			  button_center_flipped = false;
+			  forceKeyReport = true;
+			  keyReport[i] = MEDIA_KEY_CENTER;
+			  ++i;
+			}
+			if (button_A_state && button_A_flipped && !button_B_state) {
+			  if (DEBUG) Serial.println("Media key A");
+			  button_A_flipped = false;
+			  keyReport[i] = MEDIA_KEY_A;
+			  ++i;
+			}
+			if (button_B_state && button_B_flipped && !button_A_state && (i < N_KEY_REPORT)) {
+			  if (DEBUG) Serial.println("Media key B");
+			  button_B_flipped = false;
+			  keyReport[i] = MEDIA_KEY_B;
+			  ++i;
+			}
+			break;
+
 		default:
 			break;
 	}

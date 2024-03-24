@@ -2,7 +2,7 @@
 
 ### Updates
 - 3/24/2024: MotoButtons 2 design is starting. This will include a 3D printed case with mount, commercial waterproof 4-way joystick, 3 buttons (non-LED) and separate RGB LED to indicate modes. 
-- 3/4/2024: Media (music) mode has been added as a forth mode.
+- 3/4/2024: Media (music) mode has been added as a forth mode. Rechargeable LiPo battery is being considered as an option.
 
 A low cost, waterproof, Bluetooth (BLE) controller for [Drivemode Dashboard](https://www.drivemodedashboard.com/) and [MyRoute App](https://www.myrouteapp.com/) motorcycle navigation with joystick and mouse mode. The cost is only $28 in parts.
 

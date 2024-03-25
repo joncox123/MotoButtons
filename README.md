@@ -1,6 +1,6 @@
 # MotoButtons
 
-Work on MotoButtons 2 has started. The new [repository is here](https://github.com/joncox123/MotoButtons2/tree/main).
+## Work on MotoButtons 2 has started. The new [repository is here](https://github.com/joncox123/MotoButtons2/tree/main).
 
 ### Updates
 - 3/24/2024: MotoButtons 2 design is starting. This will include a 3D printed case with mount, commercial waterproof 4-way joystick, 3 buttons (non-LED) and separate RGB LED to indicate modes. Rechargeable LiPo battery is being considered as an option.
